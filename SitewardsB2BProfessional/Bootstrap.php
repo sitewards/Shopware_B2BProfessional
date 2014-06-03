@@ -42,11 +42,12 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      * returns a config value for the extension
      *
      * @param string $sConfigFlag
+     * @param mixed $mDefault
      * @return mixed
      */
-    protected function getConfigValue($sConfigFlag)
+    protected function getConfigValue($sConfigFlag, $mDefault)
     {
-        return $this->Config()->$sConfigFlag;
+        return $this->Config()->get($sConfigFlag, $mDefault);
     }
 
     /**
@@ -227,7 +228,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function onFrontendAccountSaveRegisterAfter(Enlight_Hook_HookArgs $oArguments)
     {
-        if (!$this->getConfigValue(static::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED)) {
+        if (!$this->getConfigValue(static::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED, 0)) {
             return true;
         }
 
