@@ -130,7 +130,6 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         try {
             $this->subscribeEvents();
             $this->createConfigurationForm();
-            $this->createTranslations();
             return array(
                 'success' => TRUE,
                 'invalidateCache' => array(
@@ -145,21 +144,6 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
                 'message' => $oException->getMessage()
             );
         }
-    }
-
-    /**
-     * creates frontend translations
-     */
-    protected function createTranslations()
-    {
-        $oSnippetComponent = $this->getSnippetComponent();
-
-        $oSnippetComponent->addTranslation(
-            'engine/Shopware/Plugins/Community/Backend/SitewardsB2BProfessional/Views/frontend/registration',
-            'B2BRegistrationConfirmation',
-            1,
-            2,
-            'Thank you for the registration. We will check your data and activate your account as soon as possible');
     }
 
     /**
@@ -335,12 +319,12 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function onFrontendAccountSaveRegisterAfter(Enlight_Hook_HookArgs $oArguments)
     {
-        $bExtensionActivated = $this->getConfigValue(
+        $bCustomerActivationRequired = $this->getConfigValue(
             static::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
             static::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED_DEFAULT
         );
 
-        if (!$bExtensionActivated) {
+        if (!$bCustomerActivationRequired) {
             return true;
         }
 
