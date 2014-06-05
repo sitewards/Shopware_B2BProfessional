@@ -19,11 +19,11 @@ class Shopware_Components_SitewardsB2BProfessionalFakeCurrency extends Zend_Curr
     /**
      * returns a message instead of formatted price
      *
-     * @param string|null $value
-     * @param array $options
+     * @param string|null $sValue
+     * @param array $oOptions
      * @return string
      */
-    public function toCurrency($value = null, array $options = array())
+    public function toCurrency($sValue = null, array $oOptions = array())
     {
         return $this->sPriceReplacementMessage;
     }
