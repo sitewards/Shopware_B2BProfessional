@@ -8,17 +8,17 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
 {
 
     const S_PLUGIN_NAME    = 'Sitewards B2BProfessional';
-    const S_PLUGIN_VERSION = '1.0.5';
     const S_PLUGIN_VENDOR = 'Sitewards GmbH';
     const S_PLUGIN_VENDOR_URL = 'http://www.sitewards.com';
     const S_PLUGIN_VENDOR_EMAIL = 'shopware@sitewards.com';
     const S_PLUGIN_DESCRIPTION = 'The extension offers some basic B2B functionality';
+    protected $sPluginVersion = '1.0.5';
 
     const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED = 'customer_activation_required';
-    const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED_DEFAULT = 0;
+    protected $sConfigFlagCustomerActivationRequiredDefault = 0;
 
     const S_CONFIG_FLAG_LOGIN_REQUIRED_HINT = 'customer_login_required_hint';
-    const S_CONFIG_FLAG_LOGIN_REQUIRED_HINT_DEFAULT = 'Bitte einloggen';
+    protected $sConfigFlagLoginRequiredHintDefault = 'Bitte einloggen';
 
     /** @var Shopware_Components_SitewardsB2BProfessionalCustomer */
     private $oCustomerComponent;
@@ -26,16 +26,18 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     private $oSessionComponent;
     /** @var Shopware_Components_SitewardsB2BProfessionalSnippet */
     private $oSnippetComponent;
+    /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency */
+    private $oFakeCurrencyComponent;
 
     /**
      * constructor
      *
-     * @param string $name
-     * @param Enlight_Config|null $info
+     * @param string $sName
+     * @param Enlight_Config|null $oInfo
      */
-    public function __construct($name, $info = null)
+    public function __construct($sName, $oInfo = null)
     {
-        parent::__construct($name, $info);
+        parent::__construct($sName, $oInfo);
         $this->registerNamespaceComponents();
     }
 
@@ -90,7 +92,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function getLabel()
     {
-        return static::S_PLUGIN_NAME;
+        return self::S_PLUGIN_NAME;
     }
 
     /**
@@ -100,7 +102,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function getVersion()
     {
-        return static::S_PLUGIN_VERSION;
+        return $this->sPluginVersion;
     }
 
     /**
@@ -113,10 +115,10 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         return array(
             'version'     => $this->getVersion(),
             'label'       => $this->getLabel(),
-            'supplier'    => static::S_PLUGIN_VENDOR,
-            'description' => static::S_PLUGIN_DESCRIPTION,
-            'support'     => static::S_PLUGIN_VENDOR_EMAIL,
-            'link'        => static::S_PLUGIN_VENDOR_URL
+            'supplier'    => self::S_PLUGIN_VENDOR,
+            'description' => self::S_PLUGIN_DESCRIPTION,
+            'support'     => self::S_PLUGIN_VENDOR_EMAIL,
+            'link'        => self::S_PLUGIN_VENDOR_URL
         );
     }
 
@@ -161,7 +163,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
 
         $oForm->setElement(
             'checkbox',
-            static::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
+            self::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
             array(
                 'label' => 'Activation required for customers\' login',
                 'value' => FALSE,
@@ -171,7 +173,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
 
         $oForm->setElement(
             'html',
-            static::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
+            self::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
             array(
                 'label' => 'Hint to be shown instead of prices if customer is not logged in',
                 'value' => 'Bitte einloggen',
@@ -187,32 +189,32 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     {
         $this->subscribeEvent(
             'Shopware_Controllers_Frontend_Register::saveRegister::after',
-            'onFrontendAccountSaveRegisterAfter'
+            'processUserRegistration'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_SitewardsB2B',
-            'onGetSitewardsB2BPathFrontend'
+            'registerB2BProfessionalController'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Listing',
-            'onPostDispatchFrontendProduct'
+            'processProductDisplaying'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Detail',
-            'onPostDispatchFrontendProduct'
+            'processProductDisplaying'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Note',
-            'onPostDispatchFrontendProduct'
+            'processProductDisplaying'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Index',
-            'onPostDispatchFrontendProduct'
+            'processProductDisplaying'
         );
     }
 
@@ -222,7 +224,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      * @param Enlight_Event_EventArgs $oArguments
      * @return string
      */
-    public function onGetSitewardsB2BPathFrontend(Enlight_Event_EventArgs $oArguments)
+    public function registerB2BProfessionalController(Enlight_Event_EventArgs $oArguments)
     {
         return $this->Path() . 'Controllers/Frontend/SitewardsB2BController.php';
     }
@@ -268,47 +270,77 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     }
 
     /**
+     * returns a new fake currency component
+     *
+     * @return Shopware_Components_SitewardsB2BProfessionalFakeCurrency
+     */
+    protected function getFakeCurrencyComponent()
+    {
+        if (!$this->oFakeCurrencyComponent) {
+            $this->oFakeCurrencyComponent = new Shopware_Components_SitewardsB2BProfessionalFakeCurrency();
+            $this->oFakeCurrencyComponent->setPriceReplacementMessage(
+                $this->getConfigValue(
+                    self::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
+                    $this->sConfigFlagLoginRequiredHintDefault
+                )
+            );
+        }
+
+        return $this->oFakeCurrencyComponent;
+    }
+
+    /**
      * disables price information in the frontend
+     * and hide the add-to-cart button
      *
      * @param Enlight_Event_EventArgs $oArguments
      * @return bool
      */
-    public function onPostDispatchFrontendProduct(Enlight_Event_EventArgs $oArguments)
+    public function processProductDisplaying(Enlight_Event_EventArgs $oArguments)
     {
+        $bUserLoggedIn = Shopware()->Modules()->Admin()->sCheckUser();
+
+        if (!$bUserLoggedIn) {
+            $this->Application()->Bootstrap()->registerResource('Currency', $this->getFakeCurrencyComponent());
+        }
+
+        /** @var Shopware_Controllers_Frontend_Listing $oController */
+        $oController = $oArguments->getSubject();
+
         try {
-            /** @var Shopware_Controllers_Frontend_Listing $oController */
-            $oController = $oArguments->getSubject();
             /** @var Enlight_View_Default $oView */
             $oView = $oController->View();
-            /** @var Enlight_Controller_Request_RequestHttp $oRequest */
-            $oRequest = $oController->Request();
-
-            $bIsFrontend = $oRequest->getModuleName() === 'frontend';
-            $bTemplateExists = $oView->hasTemplate();
-            $bUserLoggedIn = Shopware()->Modules()->Admin()->sCheckUser();
-
-            if (!$bIsFrontend || !$bTemplateExists || $bUserLoggedIn) {
-                return true;
-            }
-
-            $this->registerTemplateDir($oView);
-            $oView->extendsTemplate('frontend/detail/detail_price.tpl');
-            $oView->extendsTemplate('frontend/detail/similar_price.tpl');
-            $oView->extendsTemplate('frontend/listing/listing_price.tpl');
-            $oView->extendsTemplate('frontend/note/item_price.tpl');
-
-            $oView->assign(
-                'login_hint',
-                $this->getConfigValue(
-                    static::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
-                    static::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT_DEFAULT
-                )
-            );
-
-            return true;
         } catch (Exception $oException) {
+            // we have no view, we are done here
             return true;
         }
+
+        /** @var Enlight_Controller_Request_RequestHttp $oRequest */
+        $oRequest = $oController->Request();
+
+        $bIsFrontend = $oRequest->getModuleName() === 'frontend';
+        $bTemplateExists = $oView->hasTemplate();
+
+        if (!$bIsFrontend || !$bTemplateExists) {
+            return true;
+        }
+
+        $this->extendTemplates($oView);
+
+        return true;
+    }
+
+    /**
+     * extends the templates to hide add-to-cart buttons
+     *
+     * @param Enlight_View_Default $oView
+     */
+    protected function extendTemplates($oView)
+    {
+        $this->registerTemplateDir($oView);
+        $oView->extendsTemplate('frontend/detail/detail_addtocart_button.tpl');
+        $oView->extendsTemplate('frontend/listing/listing_addtocart_button.tpl');
+        $oView->extendsTemplate('frontend/header/cart_section.tpl');
     }
 
     /**
@@ -317,11 +349,11 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      * @param Enlight_Hook_HookArgs $oArguments
      * @return bool
      */
-    public function onFrontendAccountSaveRegisterAfter(Enlight_Hook_HookArgs $oArguments)
+    public function processUserRegistration(Enlight_Hook_HookArgs $oArguments)
     {
         $bCustomerActivationRequired = $this->getConfigValue(
-            static::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
-            static::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED_DEFAULT
+            self::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
+            $this->sConfigFlagCustomerActivationRequiredDefault
         );
 
         if (!$bCustomerActivationRequired) {
