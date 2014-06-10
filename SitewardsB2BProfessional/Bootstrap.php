@@ -12,7 +12,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     const S_PLUGIN_VENDOR_URL = 'http://www.sitewards.com';
     const S_PLUGIN_VENDOR_EMAIL = 'shopware@sitewards.com';
     const S_PLUGIN_DESCRIPTION = 'The extension offers some basic B2B functionality';
-    protected $sPluginVersion = '1.0.5';
+    protected $sPluginVersion = '1.0.11';
 
     const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED = 'customer_activation_required';
     protected $sConfigFlagCustomerActivationRequiredDefault = 0;
@@ -216,6 +216,12 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             'Enlight_Controller_Action_PostDispatch_Frontend_Index',
             'processProductDisplaying'
         );
+
+        $this->subscribeEvent(
+            'Enlight_Controller_Action_PostDispatch_Frontend_Checkout',
+            'addDeliveryDateField'
+        );
+
     }
 
     /**
@@ -290,6 +296,24 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     }
 
     /**
+     * adds new template for the delivery date on checkout confirmation
+     *
+     * @param Enlight_Event_EventArgs $oArguments
+     * @return bool
+     */
+    public function addDeliveryDateField(Enlight_Event_EventArgs $oArguments)
+    {
+        $oView = $oArguments->getSubject()->View();
+
+        $this->extendTemplates(
+            $oView,
+            array('frontend/checkout/confirmation_delivery_date.tpl')
+        );
+
+        return true;
+    }
+
+    /**
      * disables price information in the frontend
      * and hide the add-to-cart button
      *
@@ -325,22 +349,30 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             return true;
         }
 
-        $this->extendTemplates($oView);
+        $this->extendTemplates(
+            $oView,
+            array(
+                'frontend/detail/detail_addtocart_button.tpl',
+                'frontend/listing/listing_addtocart_button.tpl',
+                'frontend/header/cart_section.tpl'
+            )
+        );
 
         return true;
     }
 
     /**
-     * extends the templates to hide add-to-cart buttons
+     * extends a view with the given templates 
      *
      * @param Enlight_View_Default $oView
+     * @param string[] $aTemplates
      */
-    protected function extendTemplates($oView)
+    protected function extendTemplates($oView, $aTemplates = array())
     {
         $this->registerTemplateDir($oView);
-        $oView->extendsTemplate('frontend/detail/detail_addtocart_button.tpl');
-        $oView->extendsTemplate('frontend/listing/listing_addtocart_button.tpl');
-        $oView->extendsTemplate('frontend/header/cart_section.tpl');
+        foreach ($aTemplates as $sTemplate) {
+            $oView->extendsTemplate($sTemplate);
+        }
     }
 
     /**
