@@ -12,13 +12,15 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     const S_PLUGIN_VENDOR_URL = 'http://www.sitewards.com';
     const S_PLUGIN_VENDOR_EMAIL = 'shopware@sitewards.com';
     const S_PLUGIN_DESCRIPTION = 'The extension offers some basic B2B functionality';
-    protected $sPluginVersion = '1.0.11';
+    protected $sPluginVersion = '1.0.17';
 
     const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED = 'customer_activation_required';
     protected $sConfigFlagCustomerActivationRequiredDefault = 0;
 
     const S_CONFIG_FLAG_LOGIN_REQUIRED_HINT = 'customer_login_required_hint';
     protected $sConfigFlagLoginRequiredHintDefault = 'Bitte einloggen';
+
+    const S_ATTRIBUTE_NAME_DELIVERY_DATE = 'delivery_date';
 
     /** @var Shopware_Components_SitewardsB2BProfessionalCustomer */
     private $oCustomerComponent;
@@ -28,6 +30,10 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     private $oSnippetComponent;
     /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency */
     private $oFakeCurrencyComponent;
+    /** @var Shopware_Components_SitewardsB2BProfessionalInstaller */
+    private $oInstallerComponent;
+    /** @var  Shopware_Components_SitewardsB2BProfessionalOrder */
+    private $oOrderComponent;
 
     /**
      * constructor
@@ -132,6 +138,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         try {
             $this->subscribeEvents();
             $this->createConfigurationForm();
+            $this->addModelAttributes();
             return array(
                 'success' => TRUE,
                 'invalidateCache' => array(
@@ -222,6 +229,23 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             'addDeliveryDateField'
         );
 
+        $this->subscribeEvent(
+            'Shopware_Controllers_Frontend_Checkout::saveOrder::after',
+            'saveDeliveryDate'
+        );
+
+    }
+
+    /**
+     * adds attributes to existing models
+     */
+    protected function addModelAttributes()
+    {
+        $this->getInstallerComponent()->addAttribute(
+            's_order_attributes',
+            self::S_ATTRIBUTE_NAME_DELIVERY_DATE,
+            'varchar(255)'
+        );
     }
 
     /**
@@ -273,6 +297,34 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         }
 
         return $this->oSnippetComponent;
+    }
+
+    /**
+     * returns a new installer component
+     *
+     * @return Shopware_Components_SitewardsB2BProfessionalInstaller
+     */
+    protected function getInstallerComponent()
+    {
+        if (!$this->oInstallerComponent) {
+            $this->oInstallerComponent = new Shopware_Components_SitewardsB2BProfessionalInstaller();
+        }
+
+        return $this->oInstallerComponent;
+    }
+
+    /**
+     * returns a new order component
+     *
+     * @return Shopware_Components_SitewardsB2BProfessionalOrder
+     */
+    protected function getOrderComponent()
+    {
+        if (!$this->oOrderComponent) {
+            $this->oOrderComponent = new Shopware_Components_SitewardsB2BProfessionalOrder();
+        }
+
+        return $this->oOrderComponent;
     }
 
     /**
@@ -423,6 +475,23 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         );
 
         return true;
+
+    }
+
+    /**
+     * @param Enlight_Hook_HookArgs $oArguments
+     * @return bool
+     */
+    public function saveDeliveryDate(Enlight_Hook_HookArgs $oArguments)
+    {
+        $iOrderNumber = $oArguments->getReturn();
+        $sDeliveryDate = Shopware()->Front()->Request()
+            ->getParam(self::S_ATTRIBUTE_NAME_DELIVERY_DATE, '');
+
+        if ($iOrderNumber && $sDeliveryDate) {
+            $this->getOrderComponent()
+                ->saveDeliveryDate($iOrderNumber, $sDeliveryDate);
+        }
 
     }
 
