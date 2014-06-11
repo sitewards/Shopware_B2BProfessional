@@ -5,6 +5,7 @@
  * Basic helper functionality for installation procedures
  */
 class Shopware_Components_SitewardsB2BProfessionalInstaller
+    implements Shopware_Components_SitewardsB2BProfessionalInterface
 {
 
     const S_ATTRIBUTE_PREFIX = 'b2bprofessional';

@@ -12,7 +12,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     const S_PLUGIN_VENDOR_URL = 'http://www.sitewards.com';
     const S_PLUGIN_VENDOR_EMAIL = 'shopware@sitewards.com';
     const S_PLUGIN_DESCRIPTION = 'The extension offers some basic B2B functionality';
-    protected $sPluginVersion = '1.0.28';
+    protected $sPluginVersion = '1.0.31';
 
     const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED = 'customer_activation_required';
     protected $sConfigFlagCustomerActivationRequiredDefault = 0;
@@ -22,18 +22,8 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
 
     const S_ATTRIBUTE_NAME_DELIVERY_DATE = 'delivery_date';
 
-    /** @var Shopware_Components_SitewardsB2BProfessionalCustomer */
-    private $oCustomerComponent;
-    /** @var Shopware_Components_SitewardsB2BProfessionalSession */
-    private $oSessionComponent;
-    /** @var Shopware_Components_SitewardsB2BProfessionalSnippet */
-    private $oSnippetComponent;
-    /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency */
-    private $oFakeCurrencyComponent;
-    /** @var Shopware_Components_SitewardsB2BProfessionalInstaller */
-    private $oInstallerComponent;
-    /** @var  Shopware_Components_SitewardsB2BProfessionalOrder */
-    private $oOrderComponent;
+    /** @var \Shopware_Components_SitewardsB2BProfessionalFactory */
+    private $oComponentFactory;
 
     /**
      * constructor
@@ -45,6 +35,17 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     {
         parent::__construct($sName, $oInfo);
         $this->registerNamespaceComponents();
+        $this->oComponentFactory = new Shopware_Components_SitewardsB2BProfessionalFactory();
+    }
+
+    /**
+     * returns the component factory
+     *
+     * @return Shopware_Components_SitewardsB2BProfessionalFactory
+     */
+    protected function getComponentFactory()
+    {
+        return $this->oComponentFactory;
     }
 
     /**
@@ -260,11 +261,12 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     protected function addModelAttributes()
     {
-        $this->getInstallerComponent()->addAttribute(
-            's_order_attributes',
-            self::S_ATTRIBUTE_NAME_DELIVERY_DATE,
-            'varchar(255)'
-        );
+        $this->getComponentFactory()->getComponent('Installer')
+            ->addAttribute(
+                's_order_attributes',
+                self::S_ATTRIBUTE_NAME_DELIVERY_DATE,
+                'varchar(255)'
+            );
     }
 
     /**
@@ -279,94 +281,6 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     }
 
     /**
-     * returns a new customer component
-     *
-     * @return Shopware_Components_SitewardsB2BProfessionalCustomer
-     */
-    protected function getCustomerComponent()
-    {
-        if (!$this->oCustomerComponent) {
-            $this->oCustomerComponent = new Shopware_Components_SitewardsB2BProfessionalCustomer();
-        }
-        return $this->oCustomerComponent;
-    }
-
-    /**
-     * returns a new session component
-     *
-     * @return Shopware_Components_SitewardsB2BProfessionalSession
-     */
-    protected function getSessionComponent()
-    {
-        if (!$this->oSessionComponent) {
-            $this->oSessionComponent = new Shopware_Components_SitewardsB2BProfessionalSession();
-        }
-        return $this->oSessionComponent;
-    }
-
-    /**
-     * returns a new snippet component
-     *
-     * @return Shopware_Components_SitewardsB2BProfessionalSnippet
-     */
-    protected function getSnippetComponent()
-    {
-        if (!$this->oSnippetComponent) {
-            $this->oSnippetComponent = new Shopware_Components_SitewardsB2BProfessionalSnippet();
-        }
-
-        return $this->oSnippetComponent;
-    }
-
-    /**
-     * returns a new installer component
-     *
-     * @return Shopware_Components_SitewardsB2BProfessionalInstaller
-     */
-    protected function getInstallerComponent()
-    {
-        if (!$this->oInstallerComponent) {
-            $this->oInstallerComponent = new Shopware_Components_SitewardsB2BProfessionalInstaller();
-        }
-
-        return $this->oInstallerComponent;
-    }
-
-    /**
-     * returns a new order component
-     *
-     * @return Shopware_Components_SitewardsB2BProfessionalOrder
-     */
-    protected function getOrderComponent()
-    {
-        if (!$this->oOrderComponent) {
-            $this->oOrderComponent = new Shopware_Components_SitewardsB2BProfessionalOrder();
-        }
-
-        return $this->oOrderComponent;
-    }
-
-    /**
-     * returns a new fake currency component
-     *
-     * @return Shopware_Components_SitewardsB2BProfessionalFakeCurrency
-     */
-    protected function getFakeCurrencyComponent()
-    {
-        if (!$this->oFakeCurrencyComponent) {
-            $this->oFakeCurrencyComponent = new Shopware_Components_SitewardsB2BProfessionalFakeCurrency();
-            $this->oFakeCurrencyComponent->setPriceReplacementMessage(
-                $this->getConfigValue(
-                    self::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
-                    $this->sConfigFlagLoginRequiredHintDefault
-                )
-            );
-        }
-
-        return $this->oFakeCurrencyComponent;
-    }
-
-    /**
      * adds delivery date attribute to the orders' list query
      *
      * @param Enlight_Hook_HookArgs $oArguments
@@ -376,7 +290,8 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         $aParams = $oArguments->getArgs();
         $iOrderNumber = $aParams[0];
 
-        $oQuery = $this->getOrderComponent()->getBackendAdditionalOrderDataQuery($iOrderNumber);
+        $oQuery = $this->getComponentFactory()->getComponent('Order')
+            ->getBackendAdditionalOrderDataQuery($iOrderNumber);
 
         $oArguments->setReturn($oQuery);
     }
@@ -438,7 +353,21 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         $bUserLoggedIn = Shopware()->Modules()->Admin()->sCheckUser();
 
         if (!$bUserLoggedIn) {
-            $this->Application()->Bootstrap()->registerResource('Currency', $this->getFakeCurrencyComponent());
+
+            /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
+            $oFakeCurrencyComponent = $this->getComponentFactory()->getComponent(
+                'FakeCurrency',
+                array(
+                    'setPriceReplacementMessage' => array(
+                        $this->getConfigValue(
+                            self::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
+                            $this->sConfigFlagLoginRequiredHintDefault
+                        )
+                    )
+                )
+            );
+
+            $this->Application()->Bootstrap()->registerResource('Currency', $oFakeCurrencyComponent);
         }
 
         /** @var Shopware_Controllers_Frontend_Listing $oController */
@@ -506,7 +435,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         }
 
         /** @var Shopware_Components_SitewardsB2BProfessionalCustomer $oCustomerComponent */
-        $oCustomerComponent = $this->getCustomerComponent();
+        $oCustomerComponent = $this->getComponentFactory()->getComponent('Customer');
 
         /** @var \Shopware\Models\Customer\Customer $oCustomer */
         $oCustomer = $oCustomerComponent->getLoggedInCustomer();
@@ -518,7 +447,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         $oCustomerComponent->deactivateCustomer($oCustomer);
 
         /** @var Shopware_Components_SitewardsB2BProfessionalSession $oSessionComponent */
-        $oSessionComponent = $this->getSessionComponent();
+        $oSessionComponent = $this->getComponentFactory()->getComponent('Session');
 
         $oSessionComponent->logoutCustomer();
 
@@ -549,7 +478,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             ->getParam(self::S_ATTRIBUTE_NAME_DELIVERY_DATE, '');
 
         if ($iOrderNumber && $sDeliveryDate) {
-            $this->getOrderComponent()
+            $this->getComponentFactory()->getComponent('Order')
                 ->saveDeliveryDate($iOrderNumber, $sDeliveryDate);
         }
 

@@ -1,6 +1,8 @@
 <?php
 
-class Shopware_Components_SitewardsB2BProfessionalFakeCurrency extends Zend_Currency
+class Shopware_Components_SitewardsB2BProfessionalFakeCurrency
+    extends Zend_Currency
+    implements Shopware_Components_SitewardsB2BProfessionalInterface
 {
 
     /** @var string */

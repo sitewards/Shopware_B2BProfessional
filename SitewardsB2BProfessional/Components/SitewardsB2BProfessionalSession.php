@@ -5,6 +5,7 @@
  * Basic helper functionality for session handling
  */
 class Shopware_Components_SitewardsB2BProfessionalSession
+    implements Shopware_Components_SitewardsB2BProfessionalInterface
 {
 
     /**
