@@ -7,7 +7,7 @@
 class Shopware_Components_SitewardsB2BProfessionalFactory
 {
 
-    /** @var Shopware_Components_SitewardsB2BProfessionalInterface[] */
+    /** @var Object[] */
     private $aComponents = array();
 
     /**
@@ -15,7 +15,7 @@ class Shopware_Components_SitewardsB2BProfessionalFactory
      *
      * @param string $sComponentName
      * @param array $aInitMethods
-     * @return Shopware_Components_SitewardsB2BProfessionalInterface
+     * @return Object
      */
     public function getComponent($sComponentName, $aInitMethods = array())
     {

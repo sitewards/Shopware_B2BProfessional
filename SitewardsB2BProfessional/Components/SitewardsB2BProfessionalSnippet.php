@@ -5,7 +5,6 @@
  * Basic helper functionality for customer handling
  */
 class Shopware_Components_SitewardsB2BProfessionalSnippet
-    implements Shopware_Components_SitewardsB2BProfessionalInterface
 {
 
     const S_SNIPPET_TABLE_ALIAS = 'snippet';

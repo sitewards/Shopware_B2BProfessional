@@ -18,7 +18,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     public $sConfigFlagCustomerActivationRequiredDefault = 0;
 
     const S_CONFIG_FLAG_LOGIN_REQUIRED_HINT = 'customer_login_required_hint';
-    public $sConfigFlagLoginRequiredHintDefault = 'Bitte einloggen';
+    public $sConfigFlagLoginRequiredHintDefault = 'Please log in';
 
     const S_ATTRIBUTE_NAME_DELIVERY_DATE = 'delivery_date';
 
@@ -315,7 +315,12 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function processProductDisplaying(Enlight_Event_EventArgs $oArguments)
     {
-        return $this->getComponentFactory()->getComponent('Observer')->processProductDisplaying($oArguments);
+        $sPriceReplacementMessage = $this->getConfigValue(
+            self::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
+            $this->sConfigFlagLoginRequiredHintDefault
+        );
+
+        return $this->getComponentFactory()->getComponent('Observer')->processProductDisplaying($oArguments, $sPriceReplacementMessage);
     }
 
     /**
@@ -326,7 +331,17 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function saveDeliveryDate(Enlight_Hook_HookArgs $oArguments)
     {
-        return $this->getComponentFactory()->getComponent('Observer')->saveDeliveryDate($oArguments);
+        $sDeliveryDate = Shopware()->Front()->Request()
+            ->getParam(
+                self::S_ATTRIBUTE_NAME_DELIVERY_DATE,
+                ''
+            );
+
+        if (!Zend_Date::isDate($sDeliveryDate)) {
+            $sDeliveryDate = '';
+        }
+
+        return $this->getComponentFactory()->getComponent('Observer')->saveDeliveryDate($oArguments, $sDeliveryDate);
     }
 
     /**
@@ -364,8 +379,13 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function processUserRegistration(Enlight_Hook_HookArgs $oArguments)
     {
+        $bCustomerActivationRequired = $this->getConfigValue(
+            self::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
+            $this->sConfigFlagCustomerActivationRequiredDefault
+        );
+
         return $this->getComponentFactory()->getComponent('Observer')
-            ->processUserRegistration($oArguments);
+            ->processUserRegistration($oArguments, $bCustomerActivationRequired);
     }
 
 }

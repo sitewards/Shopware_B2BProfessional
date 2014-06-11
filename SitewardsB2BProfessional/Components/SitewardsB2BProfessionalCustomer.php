@@ -5,7 +5,6 @@
  * Basic helper functionality for customer handling
  */
 class Shopware_Components_SitewardsB2BProfessionalCustomer
-    implements Shopware_Components_SitewardsB2BProfessionalInterface
 {
     /**
      * returns the customer repository

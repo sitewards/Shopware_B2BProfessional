@@ -5,7 +5,6 @@
  * Observer for events catched in the bootstrap
  */
 class Shopware_Components_SitewardsB2BProfessionalObserver
-    implements Shopware_Components_SitewardsB2BProfessionalInterface
 {
     /** @var Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap */
     private $oBootstrap;
@@ -34,15 +33,11 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * handles the user registration
      *
      * @param Enlight_Hook_HookArgs $oArguments
+     * @param bool $bCustomerActivationRequired
      * @return bool
      */
-    public function processUserRegistration(Enlight_Hook_HookArgs $oArguments)
+    public function processUserRegistration(Enlight_Hook_HookArgs $oArguments, $bCustomerActivationRequired)
     {
-        $bCustomerActivationRequired = $this->getBootstrap()->getConfigValue(
-            Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
-            $this->getBootstrap()->sConfigFlagCustomerActivationRequiredDefault
-        );
-
         if (!$bCustomerActivationRequired) {
             return true;
         }
@@ -94,9 +89,10 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * and hide the add-to-cart button
      *
      * @param Enlight_Event_EventArgs $oArguments
+     * @param string $sPriceReplacementMessage
      * @return bool
      */
-    public function processProductDisplaying(Enlight_Event_EventArgs $oArguments)
+    public function processProductDisplaying(Enlight_Event_EventArgs $oArguments, $sPriceReplacementMessage)
     {
         $bUserLoggedIn = Shopware()->Modules()->Admin()->sCheckUser();
 
@@ -106,12 +102,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
             $oFakeCurrencyComponent = $this->getBootstrap()->getComponentFactory()->getComponent(
                 'FakeCurrency',
                 array(
-                    'setPriceReplacementMessage' => array(
-                        $this->getBootstrap()->getConfigValue(
-                            Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
-                            $this->getBootstrap()->sConfigFlagLoginRequiredHintDefault
-                        )
-                    )
+                    'setPriceReplacementMessage' => array($sPriceReplacementMessage)
                 )
             );
 
@@ -135,7 +126,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         $bIsFrontend = $oRequest->getModuleName() === 'frontend';
         $bTemplateExists = $oView->hasTemplate();
 
-        if (!$bIsFrontend || !$bTemplateExists) {
+        if (!($bIsFrontend && $bTemplateExists)) {
             return true;
         }
 
@@ -173,13 +164,12 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * saves the delivery date of the newly created order
      *
      * @param Enlight_Hook_HookArgs $oArguments
+     * @param string $sDeliveryDate
      * @return bool
      */
-    public function saveDeliveryDate(Enlight_Hook_HookArgs $oArguments)
+    public function saveDeliveryDate(Enlight_Hook_HookArgs $oArguments, $sDeliveryDate)
     {
         $iOrderNumber = $oArguments->getReturn();
-        $sDeliveryDate = Shopware()->Front()->Request()
-            ->getParam(Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap::S_ATTRIBUTE_NAME_DELIVERY_DATE, '');
 
         if ($iOrderNumber && $sDeliveryDate) {
             $this->getBootstrap()->getComponentFactory()->getComponent('Order')

@@ -5,7 +5,6 @@
  * Basic helper functionality for order handling
  */
 class Shopware_Components_SitewardsB2BProfessionalOrder
-    implements Shopware_Components_SitewardsB2BProfessionalInterface
 {
     /**
      * returns the order repository

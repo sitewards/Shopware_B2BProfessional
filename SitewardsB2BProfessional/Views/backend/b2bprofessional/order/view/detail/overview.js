@@ -14,7 +14,7 @@ Ext.define('Shopware.apps.Order.view.detail.Overview.b2bprofessional.Overview', 
             [
                 {
                     name: 'b2bprofessionalDeliveryDate',
-                    fieldLabel: '{s name="B2BProfessionalDeliveryDate"}Lieferdatum{/s}'
+                    fieldLabel: '{s name="B2BProfessionalDeliveryDate"}Delivery date{/s}'
                 }
             ]
         );
