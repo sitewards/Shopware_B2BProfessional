@@ -32,10 +32,9 @@ class Shopware_Components_SitewardsB2BProfessionalCustomer
     /**
      * retrieves a customer by email address
      *
-     * @param $sEmail
      * @return \Shopware\Models\Customer\Customer
      */
-    public function getCustomerByEmail($sEmail)
+    public function getLoggedInCustomer()
     {
         /** @var \Shopware\Components\Model\ModelRepository $oCustomerRepository */
         $oCustomerRepository = $this->getCustomerRepository();
@@ -43,7 +42,7 @@ class Shopware_Components_SitewardsB2BProfessionalCustomer
         /** @var Shopware\Models\Customer\Customer $oCustomer */
         $oCustomer = $oCustomerRepository->findOneBy(
             array(
-                'email' => $sEmail
+                'id' => Shopware()->Session()->sUserId
             )
         );
 

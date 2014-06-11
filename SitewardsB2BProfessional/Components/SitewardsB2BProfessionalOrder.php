@@ -103,4 +103,57 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
         }
     }
 
+    /**
+     * creates a query used for orders' backend list generation
+     *
+     * @param int $iOrderNumber
+     * @return \Doctrine\ORM\Query
+     */
+    public function getBackendAdditionalOrderDataQuery($iOrderNumber)
+    {
+        $oBuilder = $this->getOrderRepository()->createQueryBuilder('orders');
+
+        $oBuilder->select(array(
+            'orders',
+            'details',
+            'detailAttribute',
+            'documents',
+            'documentType',
+            'documentAttribute',
+            'customer',
+            'paymentInstances',
+            'debit',
+            'shipping',
+            'shippingAttribute',
+            'shippingCountry',
+            'subShop',
+            'locale',
+            'orderAttributes'
+        ));
+        $oBuilder->leftJoin('orders.documents', 'documents')
+            ->leftJoin('documents.type', 'documentType')
+            ->leftJoin('documents.attribute', 'documentAttribute')
+            ->leftJoin('orders.details', 'details')
+            ->leftJoin('details.attribute', 'detailAttribute')
+            ->leftJoin('orders.customer', 'customer')
+            ->leftJoin('customer.debit', 'debit')
+            ->leftJoin('orders.paymentInstances', 'paymentInstances')
+            ->leftJoin('orders.shipping', 'shipping')
+            ->leftJoin('shipping.attribute', 'shippingAttribute')
+            ->leftJoin('shipping.country', 'shippingCountry')
+            ->leftJoin('orders.languageSubShop', 'subShop')
+            ->leftJoin('subShop.locale', 'locale')
+            ->leftJoin('orders.attribute', 'orderAttributes');
+
+        $oBuilder->where('orders.number = :orderNumber');
+        $oBuilder->setParameter('orderNumber', $iOrderNumber);
+
+        $oQuery = $oBuilder->getQuery();
+
+        file_put_contents('c:\\debug.txt', print_r($oQuery->getSQL(), true) . PHP_EOL, FILE_APPEND);
+
+        return $oQuery;
+
+    }
+
 }

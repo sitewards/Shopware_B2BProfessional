@@ -12,7 +12,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     const S_PLUGIN_VENDOR_URL = 'http://www.sitewards.com';
     const S_PLUGIN_VENDOR_EMAIL = 'shopware@sitewards.com';
     const S_PLUGIN_DESCRIPTION = 'The extension offers some basic B2B functionality';
-    protected $sPluginVersion = '1.0.17';
+    protected $sPluginVersion = '1.0.28';
 
     const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED = 'customer_activation_required';
     protected $sConfigFlagCustomerActivationRequiredDefault = 0;
@@ -63,6 +63,16 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     protected function registerNamespaceComponents()
     {
         Shopware()->Loader()->registerNamespace('Shopware_Components', $this->Path() . 'Components/');
+    }
+
+    /**
+     * registers the snippets directory
+     */
+    protected function registerSnippetDir()
+    {
+        $this->Application()->Snippets()->addConfigDir(
+            $this->Path() . 'Snippets/'
+        );
     }
 
     /**
@@ -234,6 +244,15 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             'saveDeliveryDate'
         );
 
+        $this->subscribeEvent(
+            'Enlight_Controller_Action_PostDispatch_Backend_Order',
+            'addDeliveryDateInformation'
+        );
+
+        $this->subscribeEvent(
+            'Shopware\\Models\\Order\\Repository::getBackendAdditionalOrderDataQuery::replace',
+            'addAttributesToOrderList'
+        );
     }
 
     /**
@@ -348,6 +367,21 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     }
 
     /**
+     * adds delivery date attribute to the orders' list query
+     *
+     * @param Enlight_Hook_HookArgs $oArguments
+     */
+    public function addAttributesToOrderList(Enlight_Hook_HookArgs $oArguments)
+    {
+        $aParams = $oArguments->getArgs();
+        $iOrderNumber = $aParams[0];
+
+        $oQuery = $this->getOrderComponent()->getBackendAdditionalOrderDataQuery($iOrderNumber);
+
+        $oArguments->setReturn($oQuery);
+    }
+
+    /**
      * adds new template for the delivery date on checkout confirmation
      *
      * @param Enlight_Event_EventArgs $oArguments
@@ -363,6 +397,42 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         );
 
         return true;
+    }
+
+    /**
+     * adds information about delivery date to the backend view of an order
+     *
+     * @param Enlight_Event_EventArgs $oArguments
+     */
+    public function addDeliveryDateInformation(Enlight_Event_EventArgs $oArguments)
+    {
+        /** @var Enlight_View_Default $oView */
+        $oView = $oArguments->getSubject()->View();
+
+        $this->registerSnippetDir();
+
+        $this->registerTemplateDir($oView);
+
+        if ($oArguments->getRequest()->getActionName() === 'load') {
+
+            $this->extendTemplates(
+                $oView,
+                array(
+                    'backend/b2bprofessional/order/model/order.js',
+                    'backend/b2bprofessional/order/view/list/list.js',
+                )
+            );
+        }
+
+        if ($oArguments->getRequest()->getActionName() === 'index') {
+            $this->extendTemplates(
+                $oView,
+                array(
+                    'backend/b2bprofessional/order/view/detail/overview.js'
+                )
+            );
+        }
+
     }
 
     /**
@@ -444,14 +514,11 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             return true;
         }
 
-        $aParams = $oArguments->getSubject()->Request()->getParams();
-        $aPersonalData = $aParams['register']['personal'];
-
         /** @var Shopware_Components_SitewardsB2BProfessionalCustomer $oCustomerComponent */
         $oCustomerComponent = $this->getCustomerComponent();
 
         /** @var \Shopware\Models\Customer\Customer $oCustomer */
-        $oCustomer = $oCustomerComponent->getCustomerByEmail($aPersonalData['email']);
+        $oCustomer = $oCustomerComponent->getLoggedInCustomer();
 
         if (!$oCustomer) {
             return true;
@@ -479,6 +546,8 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     }
 
     /**
+     * saves the delivery date of the newly created order
+     *
      * @param Enlight_Hook_HookArgs $oArguments
      * @return bool
      */
