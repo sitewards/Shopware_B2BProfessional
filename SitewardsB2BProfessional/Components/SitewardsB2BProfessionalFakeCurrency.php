@@ -7,17 +7,19 @@ class Shopware_Components_SitewardsB2BProfessionalFakeCurrency extends Zend_Curr
     private $sPriceReplacementMessage = '';
 
     /**
+     * constructor
      * sets a message to be displayed instead of price
      *
      * @param string $sPriceReplacementMessage
      */
-    public function setPriceReplacementMessage($sPriceReplacementMessage)
+    public function __construct($sPriceReplacementMessage)
     {
         $this->sPriceReplacementMessage = $sPriceReplacementMessage;
     }
 
     /**
      * returns a message instead of formatted price
+     * overrides the original Zend_Currency method
      *
      * @param string|null $sValue
      * @param array $oOptions

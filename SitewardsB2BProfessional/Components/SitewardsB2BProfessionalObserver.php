@@ -6,15 +6,15 @@
  */
 class Shopware_Components_SitewardsB2BProfessionalObserver
 {
-    /** @var Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap */
+    /** @var Shopware_Components_Plugin_Bootstrap|Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap */
     private $oBootstrap;
 
     /**
-     * sets the bootstrap object
+     * constructor
      *
-     * @param Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap $oBootstrap
+     * @param Shopware_Components_Plugin_Bootstrap $oBootstrap|Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap
      */
-    public function setBootstrap(Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap $oBootstrap)
+    public function __construct(Shopware_Components_Plugin_Bootstrap $oBootstrap)
     {
         $this->oBootstrap = $oBootstrap;
     }
@@ -43,7 +43,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         }
 
         /** @var Shopware_Components_SitewardsB2BProfessionalCustomer $oCustomerComponent */
-        $oCustomerComponent = $this->getBootstrap()->getComponentFactory()->getComponent('Customer');
+        $oCustomerComponent = new Shopware_Components_SitewardsB2BProfessionalCustomer();
 
         /** @var \Shopware\Models\Customer\Customer $oCustomer */
         $oCustomer = $oCustomerComponent->getLoggedInCustomer();
@@ -55,7 +55,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         $oCustomerComponent->deactivateCustomer($oCustomer);
 
         /** @var Shopware_Components_SitewardsB2BProfessionalSession $oSessionComponent */
-        $oSessionComponent = $this->getBootstrap()->getComponentFactory()->getComponent('Session');
+        $oSessionComponent = new Shopware_Components_SitewardsB2BProfessionalSession();
 
         $oSessionComponent->logoutCustomer();
 
@@ -99,12 +99,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         if (!$bUserLoggedIn) {
 
             /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
-            $oFakeCurrencyComponent = $this->getBootstrap()->getComponentFactory()->getComponent(
-                'FakeCurrency',
-                array(
-                    'setPriceReplacementMessage' => array($sPriceReplacementMessage)
-                )
-            );
+            $oFakeCurrencyComponent = new Shopware_Components_SitewardsB2BProfessionalFakeCurrency($sPriceReplacementMessage);
 
             $this->getBootstrap()->Application()->Bootstrap()->registerResource('Currency', $oFakeCurrencyComponent);
         }
@@ -172,8 +167,8 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         $iOrderNumber = $oArguments->getReturn();
 
         if ($iOrderNumber && $sDeliveryDate) {
-            $this->getBootstrap()->getComponentFactory()->getComponent('Order')
-                ->saveDeliveryDate($iOrderNumber, $sDeliveryDate);
+            $oOrderComponent = new Shopware_Components_SitewardsB2BProfessionalOrder();
+            $oOrderComponent->saveDeliveryDate($iOrderNumber, $sDeliveryDate);
         }
 
     }
@@ -182,6 +177,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * adds information about delivery date to the backend view of an order
      *
      * @param Enlight_Event_EventArgs $oArguments
+     * @return bool
      */
     public function addDeliveryDateInformation(Enlight_Event_EventArgs $oArguments)
     {
@@ -203,22 +199,27 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
                 )
             );
         }
+
+        return true;
     }
 
     /**
      * adds delivery date attribute to the orders' list query
      *
      * @param Enlight_Hook_HookArgs $oArguments
+     * @return bool
      */
     public function addAttributesToOrderList(Enlight_Hook_HookArgs $oArguments)
     {
         $aParams = $oArguments->getArgs();
         $iOrderNumber = $aParams[0];
 
-        $oQuery = $this->getBootstrap()->getComponentFactory()->getComponent('Order')
-            ->getBackendAdditionalOrderDataQuery($iOrderNumber);
+        $oOrderComponent = new Shopware_Components_SitewardsB2BProfessionalOrder();
+        $oQuery = $oOrderComponent->getBackendAdditionalOrderDataQuery($iOrderNumber);
 
         $oArguments->setReturn($oQuery);
+
+        return true;
     }
 
 }

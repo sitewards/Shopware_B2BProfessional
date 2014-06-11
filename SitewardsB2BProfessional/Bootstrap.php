@@ -22,8 +22,8 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
 
     const S_ATTRIBUTE_NAME_DELIVERY_DATE = 'delivery_date';
 
-    /** @var \Shopware_Components_SitewardsB2BProfessionalFactory */
-    private $oComponentFactory;
+    /** @var \Shopware_Components_SitewardsB2BProfessionalObserver */
+    private $oObserver;
 
     /**
      * constructor
@@ -35,25 +35,18 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     {
         parent::__construct($sName, $oInfo);
         $this->registerNamespaceComponents();
-        // init the component factory
-        $this->oComponentFactory = new Shopware_Components_SitewardsB2BProfessionalFactory();
         // init the observer component
-        $this->getComponentFactory()->getComponent(
-            'Observer',
-            array(
-                'setBootstrap' => array($this)
-            )
-        );
+        $this->oObserver = new Shopware_Components_SitewardsB2BProfessionalObserver($this);
     }
 
     /**
-     * returns the component factory
+     * returns the observer object
      *
-     * @return Shopware_Components_SitewardsB2BProfessionalFactory
+     * @return Shopware_Components_SitewardsB2BProfessionalObserver
      */
-    public function getComponentFactory()
+    public function getObserver()
     {
-        return $this->oComponentFactory;
+        return $this->oObserver;
     }
 
     /**
@@ -272,17 +265,18 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function registerB2BProfessionalController(Enlight_Event_EventArgs $oArguments)
     {
-        return $this->getComponentFactory()->getComponent('Observer')->registerB2BProfessionalController($oArguments);
+        return $this->getObserver()->registerB2BProfessionalController($oArguments);
     }
 
     /**
      * adds delivery date attribute to the orders' list query
      *
      * @param Enlight_Hook_HookArgs $oArguments
+     * @return bool
      */
     public function addAttributesToOrderList(Enlight_Hook_HookArgs $oArguments)
     {
-        return $this->getComponentFactory()->getComponent('Observer')->addAttributesToOrderList($oArguments);
+        return $this->getObserver()->addAttributesToOrderList($oArguments);
     }
 
     /**
@@ -293,17 +287,18 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function addDeliveryDateField(Enlight_Event_EventArgs $oArguments)
     {
-        return $this->getComponentFactory()->getComponent('Observer')->addDeliveryDateField($oArguments);
+        return $this->getObserver()->addDeliveryDateField($oArguments);
     }
 
     /**
      * adds information about delivery date to the backend view of an order
      *
      * @param Enlight_Event_EventArgs $oArguments
+     * @return bool
      */
     public function addDeliveryDateInformation(Enlight_Event_EventArgs $oArguments)
     {
-        return $this->getComponentFactory()->getComponent('Observer')->addDeliveryDateInformation($oArguments);
+        return $this->getObserver()->addDeliveryDateInformation($oArguments);
     }
 
     /**
@@ -320,7 +315,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             $this->sConfigFlagLoginRequiredHintDefault
         );
 
-        return $this->getComponentFactory()->getComponent('Observer')->processProductDisplaying($oArguments, $sPriceReplacementMessage);
+        return $this->getObserver()->processProductDisplaying($oArguments, $sPriceReplacementMessage);
     }
 
     /**
@@ -341,7 +336,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             $sDeliveryDate = '';
         }
 
-        return $this->getComponentFactory()->getComponent('Observer')->saveDeliveryDate($oArguments, $sDeliveryDate);
+        return $this->getObserver()->saveDeliveryDate($oArguments, $sDeliveryDate);
     }
 
     /**
@@ -349,12 +344,12 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     protected function addModelAttributes()
     {
-        $this->getComponentFactory()->getComponent('Installer')
-            ->addAttribute(
-                's_order_attributes',
-                self::S_ATTRIBUTE_NAME_DELIVERY_DATE,
-                'varchar(255)'
-            );
+        $oInstaller = new Shopware_Components_SitewardsB2BProfessionalInstaller();
+        $oInstaller->addAttribute(
+            's_order_attributes',
+            self::S_ATTRIBUTE_NAME_DELIVERY_DATE,
+            'varchar(255)'
+        );
     }
 
     /**
@@ -384,8 +379,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             $this->sConfigFlagCustomerActivationRequiredDefault
         );
 
-        return $this->getComponentFactory()->getComponent('Observer')
-            ->processUserRegistration($oArguments, $bCustomerActivationRequired);
+        return $this->getObserver()->processUserRegistration($oArguments, $bCustomerActivationRequired);
     }
 
 }
