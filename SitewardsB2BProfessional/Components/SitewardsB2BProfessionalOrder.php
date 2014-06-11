@@ -150,8 +150,6 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
 
         $oQuery = $oBuilder->getQuery();
 
-        file_put_contents('c:\\debug.txt', print_r($oQuery->getSQL(), true) . PHP_EOL, FILE_APPEND);
-
         return $oQuery;
 
     }

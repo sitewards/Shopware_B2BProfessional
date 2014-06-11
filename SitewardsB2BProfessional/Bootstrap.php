@@ -420,19 +420,10 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
                 array(
                     'backend/b2bprofessional/order/model/order.js',
                     'backend/b2bprofessional/order/view/list/list.js',
+                    'backend/b2bprofessional/order/view/detail/overview.js',
                 )
             );
         }
-
-        if ($oArguments->getRequest()->getActionName() === 'index') {
-            $this->extendTemplates(
-                $oView,
-                array(
-                    'backend/b2bprofessional/order/view/detail/overview.js'
-                )
-            );
-        }
-
     }
 
     /**
