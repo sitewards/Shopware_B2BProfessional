@@ -4,6 +4,12 @@
  * Class Shopware_Components_SitewardsB2BProfessionalFakeCurrency
  * Replacement for currency model to display a standard message in
  * the frontend if customer is not logged in
+ *
+ * @category    Sitewards
+ * @package     Sitewards_B2BProfessional
+ * @copyright   Copyright (c) Sitewards GmbH (http://www.sitewards.com)
+ * @contact     shopware@sitewards.com
+ * @license     OSL-3.0
  */
 class Shopware_Components_SitewardsB2BProfessionalFakeCurrency extends Zend_Currency
 {

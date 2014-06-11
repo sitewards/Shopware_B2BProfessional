@@ -3,6 +3,12 @@
 /**
  * Class Shopware_Components_SitewardsB2BProfessionalCustomer
  * Basic helper functionality for customer handling
+ *
+ * @category    Sitewards
+ * @package     Sitewards_B2BProfessional
+ * @copyright   Copyright (c) Sitewards GmbH (http://www.sitewards.com)
+ * @contact     shopware@sitewards.com
+ * @license     OSL-3.0
  */
 class Shopware_Components_SitewardsB2BProfessionalSnippet
 {
