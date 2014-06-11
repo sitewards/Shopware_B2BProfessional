@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Class Shopware_Components_SitewardsB2BProfessionalFakeCurrency
+ * Replacement for currency model to display a standard message in
+ * the frontend if customer is not logged in
+ */
 class Shopware_Components_SitewardsB2BProfessionalFakeCurrency extends Zend_Currency
 {
 
