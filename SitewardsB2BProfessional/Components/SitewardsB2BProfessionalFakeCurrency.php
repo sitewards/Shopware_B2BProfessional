@@ -33,7 +33,7 @@ class Shopware_Components_SitewardsB2BProfessionalFakeCurrency extends Zend_Curr
      * overrides the original Zend_Currency method
      *
      * @param string|null $sValue
-     * @param array $oOptions
+     * @param array<string,mixed> $oOptions
      * @return string
      */
     public function toCurrency($sValue = null, array $oOptions = array())

@@ -89,8 +89,8 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      * returns a config value for the extension
      *
      * @param string $sConfigFlag
-     * @param mixed $mDefault
-     * @return mixed
+     * @param string|int|array|null $mDefault
+     * @return string|int|array|null
      */
     protected function getConfigValue($sConfigFlag, $mDefault)
     {
@@ -151,7 +151,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     /**
      * installation method
      *
-     * @return array
+     * @return array<string,mixed>
      */
     public function install()
     {
@@ -365,7 +365,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             $sDeliveryDate = '';
         }
 
-        return $this->getObserver()->saveDeliveryDate($oArguments, $sDeliveryDate, $oModelManager);
+        return $this->getObserver()->persistDeliveryDate($oArguments, $sDeliveryDate, $oModelManager);
     }
 
     /**

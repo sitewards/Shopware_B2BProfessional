@@ -187,7 +187,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return bool
      */
-    public function saveDeliveryDate(
+    public function persistDeliveryDate(
         Enlight_Hook_HookArgs $oArguments,
         $sDeliveryDate,
         \Shopware\Components\Model\ModelManager $oModelManager

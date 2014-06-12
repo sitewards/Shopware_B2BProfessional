@@ -32,8 +32,9 @@ class Shopware_Components_SitewardsB2BProfessionalCustomer
      */
     protected function getCustomerQueryBuilder($iCustomerId, \Shopware\Components\Model\ModelManager $oModelManager)
     {
-        return $this->getCustomerRepository($oModelManager)
-            ->getCustomerDetailQueryBuilder($iCustomerId);
+        /** @var \Shopware\Components\Model\ModelRepository $oCustomerRepository */
+        $oCustomerRepository = $this->getCustomerRepository($oModelManager);
+        return $oCustomerRepository->getCustomerDetailQueryBuilder($iCustomerId);
     }
 
     /**
@@ -72,10 +73,10 @@ class Shopware_Components_SitewardsB2BProfessionalCustomer
         /** @var \Shopware\Components\Model\QueryBuilder $oCustomerQueryBuilder */
         $oCustomerQueryBuilder = $this->getCustomerQueryBuilder($oCustomer->getId(), $oModelManager);
 
-        $oCustomerQueryBuilder->update()
-            ->set('customer.active', 0)
-            ->getQuery()
-            ->execute();
+        $oCustomerQueryBuilder->update();
+        $oCustomerQueryBuilder->set('customer.active', 0);
+        $oCustomerQueryBuilder->getQuery();
+        $oCustomerQueryBuilder->execute();
     }
 
     /**
