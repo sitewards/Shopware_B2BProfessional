@@ -15,40 +15,46 @@ class Shopware_Components_SitewardsB2BProfessionalCustomer
     /**
      * returns the customer repository
      *
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return \Shopware\Components\Model\ModelRepository
      */
-    protected function getCustomerRepository()
+    protected function getCustomerRepository(\Shopware\Components\Model\ModelManager $oModelManager)
     {
-        return Shopware()->Models()
-            ->getRepository('Shopware\\Models\\Customer\\Customer');
+        return $oModelManager->getRepository('Shopware\\Models\\Customer\\Customer');
     }
 
     /**
      * returns query builder for a customer by his id
      *
      * @param int $iCustomerId
-     * @return Shopware\Components\Model\QueryBuilder|\Doctrine\ORM\QueryBuilder
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
+     * @return \Shopware\Components\Model\QueryBuilder|\Doctrine\ORM\QueryBuilder
      */
-    protected function getCustomerQueryBuilder($iCustomerId)
+    protected function getCustomerQueryBuilder($iCustomerId, \Shopware\Components\Model\ModelManager $oModelManager)
     {
-        return $this->getCustomerRepository()
+        return $this->getCustomerRepository($oModelManager)
             ->getCustomerDetailQueryBuilder($iCustomerId);
     }
 
     /**
      * retrieves a customer by email address
      *
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
+     * @param Enlight_Components_Session_Namespace $oSession
      * @return \Shopware\Models\Customer\Customer
      */
-    public function getLoggedInCustomer()
+    public function getLoggedInCustomer(
+        \Shopware\Components\Model\ModelManager $oModelManager,
+        Enlight_Components_Session_Namespace $oSession
+    )
     {
         /** @var \Shopware\Components\Model\ModelRepository $oCustomerRepository */
-        $oCustomerRepository = $this->getCustomerRepository();
+        $oCustomerRepository = $this->getCustomerRepository($oModelManager);
 
-        /** @var Shopware\Models\Customer\Customer $oCustomer */
+        /** @var \Shopware\Models\Customer\Customer $oCustomer */
         $oCustomer = $oCustomerRepository->findOneBy(
             array(
-                'id' => Shopware()->Session()->sUserId
+                'id' => $oSession->sUserId
             )
         );
 
@@ -59,15 +65,27 @@ class Shopware_Components_SitewardsB2BProfessionalCustomer
      * deactivates a customer
      *
      * @param \Shopware\Models\Customer\Customer $oCustomer
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      */
-    public function deactivateCustomer($oCustomer)
+    public function deactivateCustomer($oCustomer, \Shopware\Components\Model\ModelManager $oModelManager)
     {
-        /** @var Shopware\Components\Model\QueryBuilder $oCustomerQueryBuilder */
-        $oCustomerQueryBuilder = $this->getCustomerQueryBuilder($oCustomer->getId());
+        /** @var \Shopware\Components\Model\QueryBuilder $oCustomerQueryBuilder */
+        $oCustomerQueryBuilder = $this->getCustomerQueryBuilder($oCustomer->getId(), $oModelManager);
 
         $oCustomerQueryBuilder->update()
             ->set('customer.active', 0)
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * checks if the customer is logged in
+     * @todo refactor this method if the check for logged in customer is refactored in the core
+     *
+     * @return bool
+     */
+    public function isCustomerLoggedIn()
+    {
+        return Shopware()->Modules()->Admin()->sCheckUser();
     }
 }

@@ -12,52 +12,45 @@
  */
 class Shopware_Components_SitewardsB2BProfessionalOrder
 {
+
     /**
      * returns the order repository
      *
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return \Shopware\Components\Model\ModelRepository
      */
-    protected function getOrderRepository()
+    protected function getOrderRepository(\Shopware\Components\Model\ModelManager $oModelManager)
     {
-        return Shopware()->Models()
-            ->getRepository('Shopware\\Models\\Order\\Order');
+        return $oModelManager->getRepository('Shopware\\Models\\Order\\Order');
     }
 
     /**
      * returns the order attribute repository
      *
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return \Shopware\Components\Model\ModelRepository
      */
-    protected function getOrderAttributeRepository()
+    protected function getOrderAttributeRepository(\Shopware\Components\Model\ModelManager $oModelManager)
     {
-        return Shopware()->Models()
-            ->getRepository('Shopware\\Models\\Attribute\\Order');
-    }
-
-    /**
-     * returns query builder for an order by its id
-     *
-     * @param int $iOrderId
-     * @return Shopware\Components\Model\QueryBuilder|\Doctrine\ORM\QueryBuilder
-     */
-    protected function getOrderQueryBuilder($iOrderId)
-    {
-        return $this->getOrderRepository()
-            ->getOrderDetailQueryBuilder($iOrderId);
+        return $oModelManager->getRepository('Shopware\\Models\\Attribute\\Order');
     }
 
     /**
      * retrieves an order by order number
      *
      * @param int $iOrderNumber
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return \Shopware\Models\Order\Order
      */
-    public function getOrderByNumber($iOrderNumber)
+    protected function getOrderByNumber(
+        $iOrderNumber,
+        \Shopware\Components\Model\ModelManager $oModelManager
+    )
     {
         /** @var \Shopware\Components\Model\ModelRepository $oOrderRepository */
-        $oOrderRepository = $this->getOrderRepository();
+        $oOrderRepository = $this->getOrderRepository($oModelManager);
 
-        /** @var Shopware\Models\Order\Order $oOrder */
+        /** @var \Shopware\Models\Order\Order $oOrder */
         $oOrder = $oOrderRepository->findOneBy(
             array(
                 'number' => $iOrderNumber
@@ -68,20 +61,24 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
     }
 
     /**
-     * returns order attribute by order number
+     * returns order attributes by order number
      *
      * @param int $iOrderNumber
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return \Shopware\Models\Attribute\Order|null
      */
-    public function getOrderAttributesByOrderNumber($iOrderNumber)
+    protected function getOrderAttributesByOrderNumber(
+        $iOrderNumber,
+        \Shopware\Components\Model\ModelManager $oModelManager
+    )
     {
         /** @var \Shopware\Models\Order\Order $oOrder */
-        $oOrder = $this->getOrderByNumber($iOrderNumber);
+        $oOrder = $this->getOrderByNumber($iOrderNumber, $oModelManager);
 
         /** @var \Shopware\Components\Model\ModelRepository $oOrderAttributeRepository */
-        $oOrderAttributeRepository = $this->getOrderAttributeRepository();
+        $oOrderAttributeRepository = $this->getOrderAttributeRepository($oModelManager);
 
-        /** @var Shopware\Models\Attribute\Order $oOrderAttribute */
+        /** @var \Shopware\Models\Attribute\Order $oOrderAttribute */
         $oOrderAttribute = $oOrderAttributeRepository->findOneBy(
             array(
                 'orderId' => $oOrder->getId()
@@ -96,16 +93,21 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
      *
      * @param int $iOrderNumber
      * @param string $sDeliveryDate
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      */
-    public function saveDeliveryDate($iOrderNumber, $sDeliveryDate)
+    public function saveDeliveryDate(
+        $iOrderNumber,
+        $sDeliveryDate,
+        \Shopware\Components\Model\ModelManager $oModelManager
+    )
     {
-        /** @var Shopware\Models\Attribute\Order $oOrderAttributes */
-        $oOrderAttributes = $this->getOrderAttributesByOrderNumber($iOrderNumber);
+        /** @var \Shopware\Models\Attribute\Order $oOrderAttributes */
+        $oOrderAttributes = $this->getOrderAttributesByOrderNumber($iOrderNumber, $oModelManager);
 
-        if ($sDeliveryDate && $oOrderAttributes instanceof Shopware\Models\Attribute\Order) {
+        if ($sDeliveryDate && $oOrderAttributes instanceof \Shopware\Models\Attribute\Order) {
             $oOrderAttributes->setB2bprofessionalDeliveryDate($sDeliveryDate);
-            Shopware()->Models()->persist($oOrderAttributes);
-            Shopware()->Models()->flush();
+            $oModelManager->persist($oOrderAttributes);
+            $oModelManager->flush();
         }
     }
 
@@ -113,13 +115,20 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
      * creates a query used for orders' backend list generation
      *
      * @param int $iOrderNumber
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return \Doctrine\ORM\Query
      */
-    public function getBackendAdditionalOrderDataQuery($iOrderNumber)
+    public function getBackendAdditionalOrderDataQuery(
+        $iOrderNumber,
+        \Shopware\Components\Model\ModelManager $oModelManager
+    )
     {
-        $oBuilder = $this->getOrderRepository()->createQueryBuilder('orders');
+        /** @var \Shopware\Components\Model\ModelRepository $oOrderRepository */
+        $oOrderRepository = $this->getOrderRepository($oModelManager);
+        /** @var \Doctrine\ORM\QueryBuilder $oQueryBuilder */
+        $oQueryBuilder = $oOrderRepository->createQueryBuilder('orders');
 
-        $oBuilder->select(array(
+        $oQueryBuilder->select(array(
             'orders',
             'details',
             'detailAttribute',
@@ -136,7 +145,7 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
             'locale',
             'orderAttributes'
         ));
-        $oBuilder->leftJoin('orders.documents', 'documents')
+        $oQueryBuilder->leftJoin('orders.documents', 'documents')
             ->leftJoin('documents.type', 'documentType')
             ->leftJoin('documents.attribute', 'documentAttribute')
             ->leftJoin('orders.details', 'details')
@@ -151,10 +160,10 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
             ->leftJoin('subShop.locale', 'locale')
             ->leftJoin('orders.attribute', 'orderAttributes');
 
-        $oBuilder->where('orders.number = :orderNumber');
-        $oBuilder->setParameter('orderNumber', $iOrderNumber);
+        $oQueryBuilder->where('orders.number = :orderNumber');
+        $oQueryBuilder->setParameter('orderNumber', $iOrderNumber);
 
-        $oQuery = $oBuilder->getQuery();
+        $oQuery = $oQueryBuilder->getQuery();
 
         return $oQuery;
 

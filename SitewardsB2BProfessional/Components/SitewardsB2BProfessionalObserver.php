@@ -40,9 +40,16 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      *
      * @param Enlight_Hook_HookArgs $oArguments
      * @param bool $bCustomerActivationRequired
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
+     * @param Enlight_Components_Session_Namespace $oSession
      * @return bool
      */
-    public function processUserRegistration(Enlight_Hook_HookArgs $oArguments, $bCustomerActivationRequired)
+    public function processUserRegistration(
+        Enlight_Hook_HookArgs $oArguments,
+        $bCustomerActivationRequired,
+        \Shopware\Components\Model\ModelManager $oModelManager,
+        Enlight_Components_Session_Namespace $oSession
+    )
     {
         if (!$bCustomerActivationRequired) {
             return true;
@@ -52,18 +59,18 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         $oCustomerComponent = new Shopware_Components_SitewardsB2BProfessionalCustomer();
 
         /** @var \Shopware\Models\Customer\Customer $oCustomer */
-        $oCustomer = $oCustomerComponent->getLoggedInCustomer();
+        $oCustomer = $oCustomerComponent->getLoggedInCustomer($oModelManager, $oSession);
 
         if (!$oCustomer) {
             return true;
         }
 
-        $oCustomerComponent->deactivateCustomer($oCustomer);
+        $oCustomerComponent->deactivateCustomer($oCustomer, $oModelManager);
 
         /** @var Shopware_Components_SitewardsB2BProfessionalSession $oSessionComponent */
         $oSessionComponent = new Shopware_Components_SitewardsB2BProfessionalSession();
 
-        $oSessionComponent->logoutCustomer();
+        $oSessionComponent->logoutCustomer($oSession);
 
         $oArguments->getSubject()->redirect(
             array(
@@ -81,10 +88,9 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
     /**
      * registers the frontend controller path
      *
-     * @param Enlight_Event_EventArgs $oArguments
      * @return string
      */
-    public function registerB2BProfessionalController(Enlight_Event_EventArgs $oArguments)
+    public function registerB2BProfessionalController()
     {
         return $this->getBootstrap()->Path() . 'Controllers/Frontend/SitewardsB2BController.php';
     }
@@ -96,38 +102,44 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      *
      * @param Enlight_Event_EventArgs $oArguments
      * @param string $sPriceReplacementMessage
+     * @param boolean $bCustomerLoggedIn
+     * @param string $sFrontendModuleName
      * @return bool
      */
-    public function processProductDisplaying(Enlight_Event_EventArgs $oArguments, $sPriceReplacementMessage)
+    public function processProductDisplaying(
+        Enlight_Event_EventArgs $oArguments,
+        $sPriceReplacementMessage,
+        $bCustomerLoggedIn,
+        $sFrontendModuleName
+    )
     {
-        $bUserLoggedIn = Shopware()->Modules()->Admin()->sCheckUser();
-
-        if (!$bUserLoggedIn) {
-
-            /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
-            $oFakeCurrencyComponent = new Shopware_Components_SitewardsB2BProfessionalFakeCurrency($sPriceReplacementMessage);
-
-            $this->getBootstrap()->Application()->Bootstrap()->registerResource('Currency', $oFakeCurrencyComponent);
-        }
-
-        /** @var Shopware_Controllers_Frontend_Listing $oController */
-        $oController = $oArguments->getSubject();
-
-        try {
-            /** @var Enlight_View_Default $oView */
-            $oView = $oController->View();
-        } catch (Exception $oException) {
-            // we have no view, we are done here
+        if ($bCustomerLoggedIn) {
             return true;
         }
+
+        /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
+        $oFakeCurrencyComponent = new Shopware_Components_SitewardsB2BProfessionalFakeCurrency($sPriceReplacementMessage);
+
+        $this->getBootstrap()->Application()->Bootstrap()->registerResource('Currency', $oFakeCurrencyComponent);
+
+        /** @var Enlight_Controller_Action $oController */
+        $oController = $oArguments->getSubject();
+
+        /** @var Enlight_View_Default $oView */
+        $oView = $oController->View();
 
         /** @var Enlight_Controller_Request_RequestHttp $oRequest */
         $oRequest = $oController->Request();
 
-        $bIsFrontend     = $oRequest->getModuleName() === 'frontend';
-        $bTemplateExists = $oView->hasTemplate();
+        /** @var Enlight_Controller_Response_ResponseHttp $oResponse */
+        $oResponse = $oController->Response();
 
-        if (!($bIsFrontend && $bTemplateExists)) {
+        $bIsFrontend     = $oRequest->getModuleName() === $sFrontendModuleName;
+        $bTemplateExists = $oView->hasTemplate();
+        $bIsDispatched   = $oRequest->isDispatched();
+        $bIsException    = $oResponse->isException();
+
+        if (!($bIsFrontend && $bTemplateExists && $bIsDispatched && !$bIsException)) {
             return true;
         }
 
@@ -166,15 +178,20 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      *
      * @param Enlight_Hook_HookArgs $oArguments
      * @param string $sDeliveryDate
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return bool
      */
-    public function saveDeliveryDate(Enlight_Hook_HookArgs $oArguments, $sDeliveryDate)
+    public function saveDeliveryDate(
+        Enlight_Hook_HookArgs $oArguments,
+        $sDeliveryDate,
+        \Shopware\Components\Model\ModelManager $oModelManager
+    )
     {
         $iOrderNumber = $oArguments->getReturn();
 
         if ($iOrderNumber && $sDeliveryDate) {
             $oOrderComponent = new Shopware_Components_SitewardsB2BProfessionalOrder();
-            $oOrderComponent->saveDeliveryDate($iOrderNumber, $sDeliveryDate);
+            $oOrderComponent->saveDeliveryDate($iOrderNumber, $sDeliveryDate, $oModelManager);
         }
 
         return true;
@@ -214,15 +231,19 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * adds delivery date attribute to the orders' list query
      *
      * @param Enlight_Hook_HookArgs $oArguments
+     * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return bool
      */
-    public function addAttributesToOrderList(Enlight_Hook_HookArgs $oArguments)
+    public function addAttributesToOrderList(
+        Enlight_Hook_HookArgs $oArguments,
+        \Shopware\Components\Model\ModelManager $oModelManager
+    )
     {
         $aParams      = $oArguments->getArgs();
         $iOrderNumber = $aParams[0];
 
         $oOrderComponent = new Shopware_Components_SitewardsB2BProfessionalOrder();
-        $oQuery          = $oOrderComponent->getBackendAdditionalOrderDataQuery($iOrderNumber);
+        $oQuery          = $oOrderComponent->getBackendAdditionalOrderDataQuery($iOrderNumber, $oModelManager);
 
         $oArguments->setReturn($oQuery);
 
