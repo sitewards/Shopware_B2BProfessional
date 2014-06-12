@@ -216,52 +216,52 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     {
         $this->subscribeEvent(
             'Shopware_Controllers_Frontend_Register::saveRegister::after',
-            'processUserRegistration'
+            'setUserInactiveOnRegistration'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Dispatcher_ControllerPath_Frontend_SitewardsB2B',
-            'registerB2BProfessionalController'
+            'getB2bProfessionalControllerPath'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Listing',
-            'processProductDisplaying'
+            'setB2bProfessionalLayoutUpdates'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Detail',
-            'processProductDisplaying'
+            'setB2bProfessionalLayoutUpdates'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Note',
-            'processProductDisplaying'
+            'setB2bProfessionalLayoutUpdates'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Index',
-            'processProductDisplaying'
+            'setB2bProfessionalLayoutUpdates'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Checkout',
-            'addDeliveryDateField'
+            'setDeliveryDateField'
         );
 
         $this->subscribeEvent(
             'Shopware_Controllers_Frontend_Checkout::saveOrder::after',
-            'saveDeliveryDate'
+            'persistDeliveryDate'
         );
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Backend_Order',
-            'addDeliveryDateInformation'
+            'setDeliveryDateInformation'
         );
 
         $this->subscribeEvent(
             'Shopware\\Models\\Order\\Repository::getBackendAdditionalOrderDataQuery::replace',
-            'addAttributesToOrderList'
+            'setDeliveryDateOnOrderList'
         );
     }
 
@@ -270,9 +270,9 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      *
      * @return string
      */
-    public function registerB2BProfessionalController()
+    public function getB2bProfessionalControllerPath()
     {
-        return $this->getObserver()->registerB2BProfessionalController();
+        return $this->getObserver()->getB2bProfessionalControllerPath();
     }
 
     /**
@@ -281,11 +281,11 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      * @param Enlight_Hook_HookArgs $oArguments
      * @return bool
      */
-    public function addAttributesToOrderList(Enlight_Hook_HookArgs $oArguments)
+    public function setDeliveryDateOnOrderList(Enlight_Hook_HookArgs $oArguments)
     {
         /** @var \Shopware\Components\Model\ModelManager $oModelManager */
         $oModelManager = $this->getModelManager();
-        return $this->getObserver()->addAttributesToOrderList($oArguments, $oModelManager);
+        return $this->getObserver()->setDeliveryDateOnOrderList($oArguments, $oModelManager);
     }
 
     /**
@@ -294,9 +294,9 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      * @param Enlight_Event_EventArgs $oArguments
      * @return bool
      */
-    public function addDeliveryDateField(Enlight_Event_EventArgs $oArguments)
+    public function setDeliveryDateField(Enlight_Event_EventArgs $oArguments)
     {
-        return $this->getObserver()->addDeliveryDateField($oArguments);
+        return $this->getObserver()->setDeliveryDateField($oArguments);
     }
 
     /**
@@ -305,19 +305,19 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      * @param Enlight_Event_EventArgs $oArguments
      * @return bool
      */
-    public function addDeliveryDateInformation(Enlight_Event_EventArgs $oArguments)
+    public function setDeliveryDateInformation(Enlight_Event_EventArgs $oArguments)
     {
-        return $this->getObserver()->addDeliveryDateInformation($oArguments);
+        return $this->getObserver()->setDeliveryDateInformation($oArguments);
     }
 
     /**
      * disables price information in the frontend
-     * and hide the add-to-cart button
+     * and hides the add-to-cart buttons
      *
      * @param Enlight_Event_EventArgs $oArguments
      * @return bool
      */
-    public function processProductDisplaying(Enlight_Event_EventArgs $oArguments)
+    public function setB2bProfessionalLayoutUpdates(Enlight_Event_EventArgs $oArguments)
     {
         $sPriceReplacementMessage = $this->getConfigValue(
             self::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
@@ -325,12 +325,17 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         );
 
         $oCustomerComponent = new Shopware_Components_SitewardsB2BProfessionalCustomer();
-        $bCustomerLoggedIn = $oCustomerComponent->isCustomerLoggedIn();
+        $bCustomerLoggedIn  = $oCustomerComponent->isCustomerLoggedIn();
 
-        return $this->getObserver()->processProductDisplaying(
+        if ($bCustomerLoggedIn) {
+            return true;
+        }
+
+        $this->getObserver()->setPriceReplacement($sPriceReplacementMessage);
+
+        return $this->getObserver()->setB2bProfessionalLayoutUpdates(
             $oArguments,
             $sPriceReplacementMessage,
-            $bCustomerLoggedIn,
             self::S_FRONTEND_MODULE_NAME
         );
     }
@@ -341,7 +346,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      * @param Enlight_Hook_HookArgs $oArguments
      * @return bool
      */
-    public function saveDeliveryDate(Enlight_Hook_HookArgs $oArguments)
+    public function persistDeliveryDate(Enlight_Hook_HookArgs $oArguments)
     {
         /** @var Shopware_Controllers_Frontend_Checkout $oSubject */
         $oSubject = $oArguments->getSubject();
@@ -399,7 +404,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      * @param Enlight_Hook_HookArgs $oArguments
      * @return bool
      */
-    public function processUserRegistration(Enlight_Hook_HookArgs $oArguments)
+    public function setUserInactiveOnRegistration(Enlight_Hook_HookArgs $oArguments)
     {
         $bCustomerActivationRequired = $this->getConfigValue(
             self::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
@@ -412,7 +417,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         /** @var Enlight_Components_Session_Namespace $oSession */
         $oSession = $this->getSession();
 
-        return $this->getObserver()->processUserRegistration(
+        return $this->getObserver()->setUserInactiveOnRegistration(
             $oArguments,
             $bCustomerActivationRequired,
             $oModelManager,
@@ -439,5 +444,4 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     {
         return Shopware()->Session();
     }
-
 }

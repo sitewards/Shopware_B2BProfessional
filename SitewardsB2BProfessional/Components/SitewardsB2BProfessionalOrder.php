@@ -65,7 +65,8 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
      *
      * @param int $iOrderNumber
      * @param \Shopware\Components\Model\ModelManager $oModelManager
-     * @return \Shopware\Models\Attribute\Order|null
+     * @throws Shopware_Components_SitewardsB2BProfessionalOrderAttributeNotFoundException
+     * @return \Shopware\Models\Attribute\Order
      */
     protected function getOrderAttributesByOrderNumber(
         $iOrderNumber,
@@ -85,6 +86,12 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
             )
         );
 
+        if (!$oOrderAttribute) {
+            throw new Shopware_Components_SitewardsB2BProfessionalOrderAttributeNotFoundException(
+                'Order attribute not found for order number ' . $iOrderNumber
+            );
+        }
+
         return $oOrderAttribute;
     }
 
@@ -101,10 +108,15 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
         \Shopware\Components\Model\ModelManager $oModelManager
     )
     {
-        /** @var \Shopware\Models\Attribute\Order $oOrderAttributes */
-        $oOrderAttributes = $this->getOrderAttributesByOrderNumber($iOrderNumber, $oModelManager);
+        try {
+            /** @var \Shopware\Models\Attribute\Order $oOrderAttributes */
+            $oOrderAttributes = $this->getOrderAttributesByOrderNumber($iOrderNumber, $oModelManager);
+        } catch (Shopware_Components_SitewardsB2BProfessionalOrderAttributeNotFoundException $oException) {
+            // attributes were not found, we can stop here
+            return;
+        }
 
-        if ($sDeliveryDate && $oOrderAttributes instanceof \Shopware\Models\Attribute\Order) {
+        if ($sDeliveryDate) {
             $oOrderAttributes->setB2bprofessionalDeliveryDate($sDeliveryDate);
             $oModelManager->persist($oOrderAttributes);
             $oModelManager->flush();
@@ -145,20 +157,20 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
             'locale',
             'orderAttributes'
         ));
-        $oQueryBuilder->leftJoin('orders.documents', 'documents')
-            ->leftJoin('documents.type', 'documentType')
-            ->leftJoin('documents.attribute', 'documentAttribute')
-            ->leftJoin('orders.details', 'details')
-            ->leftJoin('details.attribute', 'detailAttribute')
-            ->leftJoin('orders.customer', 'customer')
-            ->leftJoin('customer.debit', 'debit')
-            ->leftJoin('orders.paymentInstances', 'paymentInstances')
-            ->leftJoin('orders.shipping', 'shipping')
-            ->leftJoin('shipping.attribute', 'shippingAttribute')
-            ->leftJoin('shipping.country', 'shippingCountry')
-            ->leftJoin('orders.languageSubShop', 'subShop')
-            ->leftJoin('subShop.locale', 'locale')
-            ->leftJoin('orders.attribute', 'orderAttributes');
+        $oQueryBuilder->leftJoin('orders.documents', 'documents');
+        $oQueryBuilder->leftJoin('documents.type', 'documentType');
+        $oQueryBuilder->leftJoin('documents.attribute', 'documentAttribute');
+        $oQueryBuilder->leftJoin('orders.details', 'details');
+        $oQueryBuilder->leftJoin('details.attribute', 'detailAttribute');
+        $oQueryBuilder->leftJoin('orders.customer', 'customer');
+        $oQueryBuilder->leftJoin('customer.debit', 'debit');
+        $oQueryBuilder->leftJoin('orders.paymentInstances', 'paymentInstances');
+        $oQueryBuilder->leftJoin('orders.shipping', 'shipping');
+        $oQueryBuilder->leftJoin('shipping.attribute', 'shippingAttribute');
+        $oQueryBuilder->leftJoin('shipping.country', 'shippingCountry');
+        $oQueryBuilder->leftJoin('orders.languageSubShop', 'subShop');
+        $oQueryBuilder->leftJoin('subShop.locale', 'locale');
+        $oQueryBuilder->leftJoin('orders.attribute', 'orderAttributes');
 
         $oQueryBuilder->where('orders.number = :orderNumber');
         $oQueryBuilder->setParameter('orderNumber', $iOrderNumber);
@@ -168,5 +180,4 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
         return $oQuery;
 
     }
-
 }

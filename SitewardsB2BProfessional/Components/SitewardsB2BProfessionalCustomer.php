@@ -80,7 +80,7 @@ class Shopware_Components_SitewardsB2BProfessionalCustomer
 
     /**
      * checks if the customer is logged in
-     * @todo refactor this method if the check for logged in customer is refactored in the core
+     * #SHOPWARE-1 refactor this method if the check for logged in customer is refactored in the core
      *
      * @return bool
      */

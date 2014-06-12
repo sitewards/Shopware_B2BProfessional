@@ -44,7 +44,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * @param Enlight_Components_Session_Namespace $oSession
      * @return bool
      */
-    public function processUserRegistration(
+    public function setUserInactiveOnRegistration(
         Enlight_Hook_HookArgs $oArguments,
         $bCustomerActivationRequired,
         \Shopware\Components\Model\ModelManager $oModelManager,
@@ -90,9 +90,21 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      *
      * @return string
      */
-    public function registerB2BProfessionalController()
+    public function getB2bProfessionalControllerPath()
     {
         return $this->getBootstrap()->Path() . 'Controllers/Frontend/SitewardsB2BController.php';
+    }
+
+    /**
+     * replaces prices with a predefined message
+     *
+     * @param string $sPriceReplacementMessage
+     */
+    public function setPriceReplacement($sPriceReplacementMessage)
+    {
+        /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
+        $oFakeCurrencyComponent = new Shopware_Components_SitewardsB2BProfessionalFakeCurrency($sPriceReplacementMessage);
+        $this->getBootstrap()->Application()->Bootstrap()->registerResource('Currency', $oFakeCurrencyComponent);
     }
 
 
@@ -102,21 +114,15 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      *
      * @param Enlight_Event_EventArgs $oArguments
      * @param string $sPriceReplacementMessage
-     * @param boolean $bCustomerLoggedIn
      * @param string $sFrontendModuleName
      * @return bool
      */
-    public function processProductDisplaying(
+    public function setB2bProfessionalLayoutUpdates(
         Enlight_Event_EventArgs $oArguments,
         $sPriceReplacementMessage,
-        $bCustomerLoggedIn,
         $sFrontendModuleName
     )
     {
-        if ($bCustomerLoggedIn) {
-            return true;
-        }
-
         /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
         $oFakeCurrencyComponent = new Shopware_Components_SitewardsB2BProfessionalFakeCurrency($sPriceReplacementMessage);
 
@@ -161,7 +167,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * @param Enlight_Event_EventArgs $oArguments
      * @return bool
      */
-    public function addDeliveryDateField(Enlight_Event_EventArgs $oArguments)
+    public function setDeliveryDateField(Enlight_Event_EventArgs $oArguments)
     {
         $oView = $oArguments->getSubject()->View();
 
@@ -203,7 +209,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * @param Enlight_Event_EventArgs $oArguments
      * @return bool
      */
-    public function addDeliveryDateInformation(Enlight_Event_EventArgs $oArguments)
+    public function setDeliveryDateInformation(Enlight_Event_EventArgs $oArguments)
     {
         /** @var Enlight_View_Default $oView */
         $oView = $oArguments->getSubject()->View();
@@ -234,7 +240,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      * @param \Shopware\Components\Model\ModelManager $oModelManager
      * @return bool
      */
-    public function addAttributesToOrderList(
+    public function setDeliveryDateOnOrderList(
         Enlight_Hook_HookArgs $oArguments,
         \Shopware\Components\Model\ModelManager $oModelManager
     )
@@ -249,5 +255,4 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
 
         return true;
     }
-
 }
