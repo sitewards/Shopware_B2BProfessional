@@ -21,7 +21,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     protected $sPluginVersion   = '1.0.31';
 
     const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED     = 'customer_activation_required';
-    public $sConfigFlagCustomerActivationRequiredDefault = 0;
+    public $bConfigFlagCustomerActivationRequiredDefault = false;
 
     const S_CONFIG_FLAG_LOGIN_REQUIRED_HINT     = 'customer_login_required_hint';
     public $sConfigFlagLoginRequiredHintDefault = 'Please log in';
@@ -86,15 +86,27 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     }
 
     /**
-     * returns a config value for the extension
+     * returns a string config value for the extension
      *
      * @param string $sConfigFlag
-     * @param string|int|array|null $mDefault
-     * @return string|int|array|null
+     * @param string $sDefault
+     * @return string
      */
-    protected function getConfigValue($sConfigFlag, $mDefault)
+    protected function getConfigValueString($sConfigFlag, $sDefault)
     {
-        return $this->Config()->get($sConfigFlag, $mDefault);
+        return (string)$this->Config()->get($sConfigFlag, $sDefault);
+    }
+
+    /**
+     * returns a boolean config value for the extension
+     *
+     * @param string $sConfigFlag
+     * @param boolean $bDefault
+     * @return boolean
+     */
+    protected function getConfigValueBoolean($sConfigFlag, $bDefault)
+    {
+        return (boolean)$this->Config()->get($sConfigFlag, $bDefault);
     }
 
     /**
@@ -151,7 +163,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     /**
      * installation method
      *
-     * @return array<string,mixed>
+     * @return array<string,boolean|string,array<string>|string,string>
      */
     public function install()
     {
@@ -319,7 +331,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function setB2bProfessionalLayoutUpdates(Enlight_Event_EventArgs $oArguments)
     {
-        $sPriceReplacementMessage = $this->getConfigValue(
+        $sPriceReplacementMessage = $this->getConfigValueString(
             self::S_CONFIG_FLAG_LOGIN_REQUIRED_HINT,
             $this->sConfigFlagLoginRequiredHintDefault
         );
@@ -406,9 +418,9 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function setUserInactiveOnRegistration(Enlight_Hook_HookArgs $oArguments)
     {
-        $bCustomerActivationRequired = $this->getConfigValue(
+        $bCustomerActivationRequired = $this->getConfigValueBoolean(
             self::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
-            $this->sConfigFlagCustomerActivationRequiredDefault
+            $this->bConfigFlagCustomerActivationRequiredDefault
         );
 
         /** @var \Shopware\Components\Model\ModelManager $oModelManager */
