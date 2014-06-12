@@ -1,3 +1,5 @@
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/sitewards/Shopware_B2BProfessional/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/sitewards/Shopware_B2BProfessional/?branch=master)
+
 Shopware_B2BProfessional
 ========================
 
