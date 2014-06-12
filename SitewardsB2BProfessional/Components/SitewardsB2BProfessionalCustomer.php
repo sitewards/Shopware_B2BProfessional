@@ -26,7 +26,7 @@ class Shopware_Components_SitewardsB2BProfessionalCustomer
     /**
      * returns query builder for a customer by his id
      *
-     * @param $iCustomerId
+     * @param int $iCustomerId
      * @return Shopware\Components\Model\QueryBuilder|\Doctrine\ORM\QueryBuilder
      */
     protected function getCustomerQueryBuilder($iCustomerId)

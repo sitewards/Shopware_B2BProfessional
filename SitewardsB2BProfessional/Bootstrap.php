@@ -13,17 +13,17 @@
 class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
 
-    const S_PLUGIN_NAME    = 'Sitewards B2BProfessional';
-    const S_PLUGIN_VENDOR = 'Sitewards GmbH';
-    const S_PLUGIN_VENDOR_URL = 'http://www.sitewards.com';
+    const S_PLUGIN_NAME         = 'Sitewards B2BProfessional';
+    const S_PLUGIN_VENDOR       = 'Sitewards GmbH';
+    const S_PLUGIN_VENDOR_URL   = 'http://www.sitewards.com';
     const S_PLUGIN_VENDOR_EMAIL = 'shopware@sitewards.com';
-    const S_PLUGIN_DESCRIPTION = 'The extension offers some basic B2B functionality';
-    protected $sPluginVersion = '1.0.31';
+    const S_PLUGIN_DESCRIPTION  = 'The extension offers some basic B2B functionality';
+    protected $sPluginVersion   = '1.0.31';
 
-    const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED = 'customer_activation_required';
+    const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED     = 'customer_activation_required';
     public $sConfigFlagCustomerActivationRequiredDefault = 0;
 
-    const S_CONFIG_FLAG_LOGIN_REQUIRED_HINT = 'customer_login_required_hint';
+    const S_CONFIG_FLAG_LOGIN_REQUIRED_HINT     = 'customer_login_required_hint';
     public $sConfigFlagLoginRequiredHintDefault = 'Please log in';
 
     const S_ATTRIBUTE_NAME_DELIVERY_DATE = 'delivery_date';
@@ -98,14 +98,14 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     /**
      * returns the capabilities of the extension
      *
-     * @return bool[]
+     * @return array<string,bool>
      */
     public function getCapabilities()
     {
         return array(
-            'install' => TRUE,
-            'update'  => TRUE,
-            'enable'  => TRUE
+            'install' => true,
+            'update'  => true,
+            'enable'  => true
         );
     }
 
@@ -132,7 +132,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     /**
      * returns the overall information about the extension
      *
-     * @return string[]
+     * @return array<string,string>
      */
     public function getInfo()
     {
@@ -149,7 +149,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     /**
      * installation method
      *
-     * @return bool|array
+     * @return array
      */
     public function install()
     {
@@ -158,7 +158,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             $this->createConfigurationForm();
             $this->addModelAttributes();
             return array(
-                'success' => TRUE,
+                'success' => true,
                 'invalidateCache' => array(
                     'backend',
                     'frontend',
@@ -167,7 +167,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             );
         } catch (\Exception $oException) {
             return array(
-                'success' => FALSE,
+                'success' => false,
                 'message' => $oException->getMessage()
             );
         }
@@ -178,7 +178,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function createConfigurationForm()
     {
-        $oForm = $this->Form();
+        $oForm   = $this->Form();
         $oParent = $this->Forms()->findOneBy(
             array(
                 'name' => 'Backend'
@@ -191,7 +191,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             self::S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED,
             array(
                 'label' => 'Activation required for customers\' login',
-                'value' => FALSE,
+                'value' => false,
                 'scope' => Shopware\Models\Config\Element::SCOPE_SHOP
             )
         );

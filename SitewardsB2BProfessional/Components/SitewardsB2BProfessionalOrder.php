@@ -37,7 +37,7 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
     /**
      * returns query builder for an order by its id
      *
-     * @param $iOrderId
+     * @param int $iOrderId
      * @return Shopware\Components\Model\QueryBuilder|\Doctrine\ORM\QueryBuilder
      */
     protected function getOrderQueryBuilder($iOrderId)
@@ -49,7 +49,7 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
     /**
      * retrieves an order by order number
      *
-     * @param $iOrderNumber
+     * @param int $iOrderNumber
      * @return \Shopware\Models\Order\Order
      */
     public function getOrderByNumber($iOrderNumber)

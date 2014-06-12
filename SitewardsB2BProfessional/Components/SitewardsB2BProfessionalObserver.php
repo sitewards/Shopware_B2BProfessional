@@ -124,7 +124,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         /** @var Enlight_Controller_Request_RequestHttp $oRequest */
         $oRequest = $oController->Request();
 
-        $bIsFrontend = $oRequest->getModuleName() === 'frontend';
+        $bIsFrontend     = $oRequest->getModuleName() === 'frontend';
         $bTemplateExists = $oView->hasTemplate();
 
         if (!($bIsFrontend && $bTemplateExists)) {
@@ -177,6 +177,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
             $oOrderComponent->saveDeliveryDate($iOrderNumber, $sDeliveryDate);
         }
 
+        return true;
     }
 
     /**
@@ -217,11 +218,11 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      */
     public function addAttributesToOrderList(Enlight_Hook_HookArgs $oArguments)
     {
-        $aParams = $oArguments->getArgs();
+        $aParams      = $oArguments->getArgs();
         $iOrderNumber = $aParams[0];
 
         $oOrderComponent = new Shopware_Components_SitewardsB2BProfessionalOrder();
-        $oQuery = $oOrderComponent->getBackendAdditionalOrderDataQuery($iOrderNumber);
+        $oQuery          = $oOrderComponent->getBackendAdditionalOrderDataQuery($iOrderNumber);
 
         $oArguments->setReturn($oQuery);
 
