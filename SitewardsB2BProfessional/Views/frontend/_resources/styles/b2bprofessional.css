@@ -1,0 +1,13 @@
+.checkout_delivery_date {
+	text-align: right;
+	margin-bottom: 10px;
+	padding-right: 5px;
+}
+
+.checkout_delivery_date label {
+	padding-right: 5px;
+}
+
+#ui-datepicker-div {
+	width: 170px;
+}
