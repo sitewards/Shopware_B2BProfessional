@@ -3,6 +3,13 @@ Shopware_B2BProfessional
 
 Sitewards B2BProfessional extension for Shopware
 
+Functionality:
+--------------
+- hide prices for not logged in customers
+- hide add-to-cart buttons for not logged in customers
+- deactivate customers on registration, so that they have to be enabled manually by shop owner
+- additional input of the delivery date on the last checkout step
+
 Installation:
 -------------
 1. The folder SitewardsB2BProfessional should be put into engine/Shopware/Plugins/Community/Backend
