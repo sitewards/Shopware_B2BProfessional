@@ -159,7 +159,8 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             'supplier'    => self::S_PLUGIN_VENDOR,
             'description' => self::S_PLUGIN_DESCRIPTION,
             'support'     => self::S_PLUGIN_VENDOR_EMAIL,
-            'link'        => self::S_PLUGIN_VENDOR_URL
+            'link'        => self::S_PLUGIN_VENDOR_URL,
+            'author'      => self::S_PLUGIN_VENDOR
         );
     }
 
