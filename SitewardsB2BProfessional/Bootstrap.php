@@ -18,7 +18,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     const S_PLUGIN_VENDOR_URL   = 'http://www.sitewards.com';
     const S_PLUGIN_VENDOR_EMAIL = 'shopware@sitewards.com';
     const S_PLUGIN_DESCRIPTION  = 'The extension offers some basic B2B functionality';
-    protected $sPluginVersion   = '1.0.31';
+    protected $sPluginVersion   = '1.0.32';
 
     const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED     = 'customer_activation_required';
     public $bConfigFlagCustomerActivationRequiredDefault = false;
@@ -253,6 +253,11 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
 
         $this->subscribeEvent(
             'Enlight_Controller_Action_PostDispatch_Frontend_Index',
+            'setB2bProfessionalLayoutUpdates'
+        );
+
+        $this->subscribeEvent(
+            'Enlight_Controller_Action_PostDispatch_Frontend_Compare',
             'setB2bProfessionalLayoutUpdates'
         );
 
