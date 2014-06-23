@@ -75,8 +75,8 @@ class Shopware_Components_SitewardsB2BProfessionalCustomer
 
         $oCustomerQueryBuilder->update();
         $oCustomerQueryBuilder->set('customer.active', 0);
-        $oCustomerQueryBuilder->getQuery();
-        $oCustomerQueryBuilder->execute();
+        $oCustomerDeactivationQuery = $oCustomerQueryBuilder->getQuery();
+        $oCustomerDeactivationQuery->execute();
     }
 
     /**
