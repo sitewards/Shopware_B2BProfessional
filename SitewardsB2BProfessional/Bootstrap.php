@@ -18,13 +18,16 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
     const S_PLUGIN_VENDOR_URL   = 'http://www.sitewards.com';
     const S_PLUGIN_VENDOR_EMAIL = 'shopware@sitewards.com';
     const S_PLUGIN_DESCRIPTION  = 'The extension offers some basic B2B functionality';
-    protected $sPluginVersion   = '1.0.32';
+    protected $sPluginVersion   = '1.0.34';
 
     const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED     = 'customer_activation_required';
     public $bConfigFlagCustomerActivationRequiredDefault = false;
 
     const S_CONFIG_FLAG_LOGIN_REQUIRED_HINT     = 'customer_login_required_hint';
     public $sConfigFlagLoginRequiredHintDefault = 'Please log in';
+
+    const S_CONFIG_FLAG_SHOW_DELIVERY_DATE     = 'show_delivery_date';
+    public $bConfigFlagShowDeliveryDateDefault = false;
 
     const S_ATTRIBUTE_NAME_DELIVERY_DATE = 'delivery_date';
 
@@ -219,6 +222,16 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
                 'scope' => Shopware\Models\Config\Element::SCOPE_LOCALE
             )
         );
+
+        $oForm->setElement(
+            'checkbox',
+            self::S_CONFIG_FLAG_SHOW_DELIVERY_DATE,
+            array(
+                'label' => 'Show delivery date input on the last checkout step',
+                'value' => $this->bConfigFlagShowDeliveryDateDefault,
+                'scope' => Shopware\Models\Config\Element::SCOPE_SHOP
+            )
+        );
     }
 
     /**
@@ -313,6 +326,15 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
      */
     public function setDeliveryDateField(Enlight_Event_EventArgs $oArguments)
     {
+        $bDeliveryDateEnabled = $this->getConfigValueBoolean(
+            self::S_CONFIG_FLAG_SHOW_DELIVERY_DATE,
+            $this->bConfigFlagShowDeliveryDateDefault
+        );
+
+        if (!$bDeliveryDateEnabled) {
+            return true;
+        }
+
         return $this->getObserver()->setDeliveryDateField($oArguments);
     }
 
