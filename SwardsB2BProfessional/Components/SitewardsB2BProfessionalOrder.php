@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Shopware_Components_SitewardsB2BProfessionalOrder
+ * Class Shopware_Components_SwardsB2BProfessionalOrder
  * Basic helper functionality for order handling
  *
  * @category    Sitewards
@@ -10,7 +10,7 @@
  * @contact     shopware@sitewards.com
  * @license     OSL-3.0
  */
-class Shopware_Components_SitewardsB2BProfessionalOrder
+class Shopware_Components_SwardsB2BProfessionalOrder
 {
 
     /**
@@ -65,7 +65,7 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
      *
      * @param int $iOrderNumber
      * @param \Shopware\Components\Model\ModelManager $oModelManager
-     * @throws Shopware_Components_SitewardsB2BProfessionalOrderAttributeNotFoundException
+     * @throws Shopware_Components_SwardsB2BProfessionalOrderAttributeNotFoundException
      * @return \Shopware\Models\Attribute\Order
      */
     protected function getOrderAttributesByOrderNumber(
@@ -87,7 +87,7 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
         );
 
         if (!$oOrderAttribute) {
-            throw new Shopware_Components_SitewardsB2BProfessionalOrderAttributeNotFoundException(
+            throw new Shopware_Components_SwardsB2BProfessionalOrderAttributeNotFoundException(
                 'Order attribute not found for order number ' . $iOrderNumber
             );
         }
@@ -111,7 +111,7 @@ class Shopware_Components_SitewardsB2BProfessionalOrder
         try {
             /** @var \Shopware\Models\Attribute\Order $oOrderAttributes */
             $oOrderAttributes = $this->getOrderAttributesByOrderNumber($iOrderNumber, $oModelManager);
-        } catch (Shopware_Components_SitewardsB2BProfessionalOrderAttributeNotFoundException $oException) {
+        } catch (Shopware_Components_SwardsB2BProfessionalOrderAttributeNotFoundException $oException) {
             // attributes were not found, we can stop here
             return;
         }

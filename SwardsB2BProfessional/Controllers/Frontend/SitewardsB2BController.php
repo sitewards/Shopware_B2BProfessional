@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Class Shopware_Controllers_Frontend_SitewardsB2B
+ * Class Shopware_Controllers_Frontend_SwardsB2B
  * Shows the standard message on successful registration
  */
-class Shopware_Controllers_Frontend_SitewardsB2B extends Enlight_Controller_Action
+class Shopware_Controllers_Frontend_SwardsB2B extends Enlight_Controller_Action
 {
     /**
      * initializes the controller

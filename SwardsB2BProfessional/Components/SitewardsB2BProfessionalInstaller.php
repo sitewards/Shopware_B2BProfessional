@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Shopware_Components_SitewardsB2BProfessionalInstaller
+ * Class Shopware_Components_SwardsB2BProfessionalInstaller
  * Basic helper functionality for installation procedures
  *
  * @category    Sitewards
@@ -10,7 +10,7 @@
  * @contact     shopware@sitewards.com
  * @license     OSL-3.0
  */
-class Shopware_Components_SitewardsB2BProfessionalInstaller
+class Shopware_Components_SwardsB2BProfessionalInstaller
 {
 
     const S_ATTRIBUTE_PREFIX = 'b2bprofessional';

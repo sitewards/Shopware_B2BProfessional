@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Shopware_Components_SitewardsB2BProfessionalObserver
+ * Class Shopware_Components_SwardsB2BProfessionalObserver
  * Observer for events catched in the bootstrap
  *
  * @category    Sitewards
@@ -10,15 +10,15 @@
  * @contact     shopware@sitewards.com
  * @license     OSL-3.0
  */
-class Shopware_Components_SitewardsB2BProfessionalObserver
+class Shopware_Components_SwardsB2BProfessionalObserver
 {
-    /** @var Shopware_Components_Plugin_Bootstrap|Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap */
+    /** @var Shopware_Components_Plugin_Bootstrap|Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap */
     private $oBootstrap;
 
     /**
      * constructor
      *
-     * @param Shopware_Components_Plugin_Bootstrap $oBootstrap|Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap
+     * @param Shopware_Components_Plugin_Bootstrap $oBootstrap|Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap
      */
     public function __construct(Shopware_Components_Plugin_Bootstrap $oBootstrap)
     {
@@ -28,7 +28,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
     /**
      * returns the bootstrap object
      *
-     * @return Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap
+     * @return Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap
      */
     public function getBootstrap()
     {
@@ -55,8 +55,8 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
             return true;
         }
 
-        /** @var Shopware_Components_SitewardsB2BProfessionalCustomer $oCustomerComponent */
-        $oCustomerComponent = new Shopware_Components_SitewardsB2BProfessionalCustomer();
+        /** @var Shopware_Components_SwardsB2BProfessionalCustomer $oCustomerComponent */
+        $oCustomerComponent = new Shopware_Components_SwardsB2BProfessionalCustomer();
 
         /** @var \Shopware\Models\Customer\Customer $oCustomer */
         $oCustomer = $oCustomerComponent->getLoggedInCustomer($oModelManager, $oSession);
@@ -67,8 +67,8 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
 
         $oCustomerComponent->deactivateCustomer($oCustomer, $oModelManager);
 
-        /** @var Shopware_Components_SitewardsB2BProfessionalSession $oSessionComponent */
-        $oSessionComponent = new Shopware_Components_SitewardsB2BProfessionalSession();
+        /** @var Shopware_Components_SwardsB2BProfessionalSession $oSessionComponent */
+        $oSessionComponent = new Shopware_Components_SwardsB2BProfessionalSession();
 
         $oSessionComponent->logoutCustomer($oSession);
 
@@ -102,8 +102,8 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
      */
     public function setPriceReplacement($sPriceReplacementMessage)
     {
-        /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
-        $oFakeCurrencyComponent = new Shopware_Components_SitewardsB2BProfessionalFakeCurrency($sPriceReplacementMessage);
+        /** @var Shopware_Components_SwardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
+        $oFakeCurrencyComponent = new Shopware_Components_SwardsB2BProfessionalFakeCurrency($sPriceReplacementMessage);
         $this->getBootstrap()->Application()->Bootstrap()->registerResource('Currency', $oFakeCurrencyComponent);
     }
 
@@ -123,8 +123,8 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         $sFrontendModuleName
     )
     {
-        /** @var Shopware_Components_SitewardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
-        $oFakeCurrencyComponent = new Shopware_Components_SitewardsB2BProfessionalFakeCurrency($sPriceReplacementMessage);
+        /** @var Shopware_Components_SwardsB2BProfessionalFakeCurrency $oFakeCurrencyComponent */
+        $oFakeCurrencyComponent = new Shopware_Components_SwardsB2BProfessionalFakeCurrency($sPriceReplacementMessage);
 
         $this->getBootstrap()->Application()->Bootstrap()->registerResource('Currency', $oFakeCurrencyComponent);
 
@@ -196,7 +196,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         $iOrderNumber = $oArguments->getReturn();
 
         if ($iOrderNumber && $sDeliveryDate) {
-            $oOrderComponent = new Shopware_Components_SitewardsB2BProfessionalOrder();
+            $oOrderComponent = new Shopware_Components_SwardsB2BProfessionalOrder();
             $oOrderComponent->saveDeliveryDate($iOrderNumber, $sDeliveryDate, $oModelManager);
         }
 
@@ -248,7 +248,7 @@ class Shopware_Components_SitewardsB2BProfessionalObserver
         $aParams      = $oArguments->getArgs();
         $iOrderNumber = $aParams[0];
 
-        $oOrderComponent = new Shopware_Components_SitewardsB2BProfessionalOrder();
+        $oOrderComponent = new Shopware_Components_SwardsB2BProfessionalOrder();
         $oQuery          = $oOrderComponent->getBackendAdditionalOrderDataQuery($iOrderNumber, $oModelManager);
 
         $oArguments->setReturn($oQuery);

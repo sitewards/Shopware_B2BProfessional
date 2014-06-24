@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Shopware_Components_SitewardsB2BProfessionalSession
+ * Class Shopware_Components_SwardsB2BProfessionalSession
  * Basic helper functionality for session handling
  *
  * @category    Sitewards
@@ -10,7 +10,7 @@
  * @contact     shopware@sitewards.com
  * @license     OSL-3.0
  */
-class Shopware_Components_SitewardsB2BProfessionalSession
+class Shopware_Components_SwardsB2BProfessionalSession
 {
 
     /**

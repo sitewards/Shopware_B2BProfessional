@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Shopware_Components_SitewardsB2BProfessionalFakeCurrency
+ * Class Shopware_Components_SwardsB2BProfessionalFakeCurrency
  * Replacement for currency model to display a standard message in
  * the frontend if customer is not logged in
  *
@@ -11,7 +11,7 @@
  * @contact     shopware@sitewards.com
  * @license     OSL-3.0
  */
-class Shopware_Components_SitewardsB2BProfessionalFakeCurrency extends Zend_Currency
+class Shopware_Components_SwardsB2BProfessionalFakeCurrency extends Zend_Currency
 {
 
     /** @var string */

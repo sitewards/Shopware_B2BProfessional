@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Shopware_Components_SitewardsB2BProfessionalOrderAttributeNotFoundException
+ * Class Shopware_Components_SwardsB2BProfessionalOrderAttributeNotFoundException
  * Exception if the order attributes were not found
  *
  * @category    Sitewards
@@ -10,6 +10,6 @@
  * @contact     shopware@sitewards.com
  * @license     OSL-3.0
  */
-class Shopware_Components_SitewardsB2BProfessionalOrderAttributeNotFoundException extends Enlight_Exception
+class Shopware_Components_SwardsB2BProfessionalOrderAttributeNotFoundException extends Enlight_Exception
 {
 }

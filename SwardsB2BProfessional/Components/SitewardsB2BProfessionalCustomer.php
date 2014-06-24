@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Shopware_Components_SitewardsB2BProfessionalCustomer
+ * Class Shopware_Components_SwardsB2BProfessionalCustomer
  * Basic helper functionality for customer handling
  *
  * @category    Sitewards
@@ -10,7 +10,7 @@
  * @contact     shopware@sitewards.com
  * @license     OSL-3.0
  */
-class Shopware_Components_SitewardsB2BProfessionalCustomer
+class Shopware_Components_SwardsB2BProfessionalCustomer
 {
     /**
      * returns the customer repository

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap
+ * Class Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap
  * Bootstrapping the main functionality of the B2BProfessional extension
  *
  * @category    Sitewards
@@ -10,7 +10,7 @@
  * @contact     shopware@sitewards.com
  * @license     OSL-3.0
  */
-class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopware_Components_Plugin_Bootstrap
+class Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
 
     const S_PLUGIN_NAME         = 'Sitewards B2BProfessional';
@@ -31,7 +31,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
 
     const S_ATTRIBUTE_NAME_DELIVERY_DATE = 'delivery_date';
 
-    /** @var \Shopware_Components_SitewardsB2BProfessionalObserver */
+    /** @var \Shopware_Components_SwardsB2BProfessionalObserver */
     private $oObserver;
 
     const S_FRONTEND_MODULE_NAME = 'frontend';
@@ -47,13 +47,13 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         parent::__construct($sName, $oInfo);
         $this->registerNamespaceComponents();
         // init the observer component
-        $this->oObserver = new Shopware_Components_SitewardsB2BProfessionalObserver($this);
+        $this->oObserver = new Shopware_Components_SwardsB2BProfessionalObserver($this);
     }
 
     /**
      * returns the observer object
      *
-     * @return Shopware_Components_SitewardsB2BProfessionalObserver
+     * @return Shopware_Components_SwardsB2BProfessionalObserver
      */
     public function getObserver()
     {
@@ -364,7 +364,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
             $this->sConfigFlagLoginRequiredHintDefault
         );
 
-        $oCustomerComponent = new Shopware_Components_SitewardsB2BProfessionalCustomer();
+        $oCustomerComponent = new Shopware_Components_SwardsB2BProfessionalCustomer();
         $bCustomerLoggedIn  = $oCustomerComponent->isCustomerLoggedIn();
 
         if ($bCustomerLoggedIn) {
@@ -416,7 +416,7 @@ class Shopware_Plugins_Backend_SitewardsB2BProfessional_Bootstrap extends Shopwa
         /** @var \Shopware\Components\Model\ModelManager $oModelManager */
         $oModelManager = $this->getModelManager();
 
-        $oInstaller = new Shopware_Components_SitewardsB2BProfessionalInstaller($oModelManager);
+        $oInstaller = new Shopware_Components_SwardsB2BProfessionalInstaller($oModelManager);
         $oInstaller->addAttribute(
             's_order_attributes',
             self::S_ATTRIBUTE_NAME_DELIVERY_DATE,
