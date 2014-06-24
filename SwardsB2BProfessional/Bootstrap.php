@@ -246,7 +246,7 @@ class Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap extends Shopware_
         );
 
         $this->subscribeEvent(
-            'Enlight_Controller_Dispatcher_ControllerPath_Frontend_SitewardsB2B',
+            'Enlight_Controller_Dispatcher_ControllerPath_Frontend_SwardsB2B',
             'getB2bProfessionalControllerPath'
         );
 

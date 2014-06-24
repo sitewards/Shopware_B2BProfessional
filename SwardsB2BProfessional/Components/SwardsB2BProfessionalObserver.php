@@ -74,7 +74,7 @@ class Shopware_Components_SwardsB2BProfessionalObserver
 
         $oArguments->getSubject()->redirect(
             array(
-                'controller' => 'SitewardsB2B',
+                'controller' => 'SwardsB2B',
                 'action'     => 'registration'
             ),
             array(
@@ -92,7 +92,7 @@ class Shopware_Components_SwardsB2BProfessionalObserver
      */
     public function getB2bProfessionalControllerPath()
     {
-        return $this->getBootstrap()->Path() . 'Controllers/Frontend/SitewardsB2BController.php';
+        return $this->getBootstrap()->Path() . 'Controllers/Frontend/SwardsB2BController.php';
     }
 
     /**
