@@ -18,7 +18,6 @@ class Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap extends Shopware_
     const S_PLUGIN_VENDOR_URL   = 'http://www.sitewards.com';
     const S_PLUGIN_VENDOR_EMAIL = 'shopware@sitewards.com';
     const S_PLUGIN_DESCRIPTION  = 'The extension offers some basic B2B functionality';
-    protected $sPluginVersion   = '1.0.34';
 
     const S_CONFIG_FLAG_CUSTOMER_ACTIVATION_REQUIRED     = 'customer_activation_required';
     public $bConfigFlagCustomerActivationRequiredDefault = false;
@@ -37,7 +36,7 @@ class Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap extends Shopware_
     const S_FRONTEND_MODULE_NAME = 'frontend';
 
     /**
-     * constructor
+     * constructor method for the bootstrap class
      *
      * @param string $sName
      * @param Enlight_Config|null $oInfo
@@ -143,7 +142,7 @@ class Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap extends Shopware_
      */
     public function getVersion()
     {
-        return $this->sPluginVersion;
+        return "1.0.34";
     }
 
     /**

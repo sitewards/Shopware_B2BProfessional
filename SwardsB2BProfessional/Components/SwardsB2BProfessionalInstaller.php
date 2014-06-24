@@ -19,7 +19,7 @@ class Shopware_Components_SwardsB2BProfessionalInstaller
     private $oModelManager;
 
     /**
-     * constructor
+     * constructor method for the installer class
      *
      * @param \Shopware\Components\Model\ModelManager $oModelManager
      */
@@ -59,6 +59,8 @@ class Shopware_Components_SwardsB2BProfessionalInstaller
     }
 
     /**
+     * adds an attribute to a model
+     *
      * @param string $sModelName
      * @param string $sAttributeName
      * @param string $sAttributeType

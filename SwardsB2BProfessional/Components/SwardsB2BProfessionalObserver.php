@@ -16,7 +16,7 @@ class Shopware_Components_SwardsB2BProfessionalObserver
     private $oBootstrap;
 
     /**
-     * constructor
+     * constructor method for the observer class
      *
      * @param Shopware_Components_Plugin_Bootstrap $oBootstrap|Shopware_Plugins_Backend_SwardsB2BProfessional_Bootstrap
      */
